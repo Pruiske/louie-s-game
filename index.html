@@ -16,9 +16,10 @@
             margin: 0;
             padding: 10px;
             touch-action: manipulation;
+            overflow-x: hidden;
         }
 
-        /* STARTMENU - Dit staat over alles heen aan het begin */
+        /* STARTMENU */
         #menu-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -28,18 +29,19 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            text-align: center;
         }
 
         .menu-box {
             background: white;
-            padding: 40px 20px;
+            padding: 30px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             width: 85%;
             max-width: 350px;
+            text-align: center;
         }
 
+        /* STATISTIEKEN BOVENAAN */
         #ui-container {
             background: white;
             padding: 12px;
@@ -49,19 +51,30 @@
             width: 100%;
             max-width: 500px;
             box-sizing: border-box;
+            display: none;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: repeat(3, 1fr); /* 3 kolommen voor Score, Tijd, Fouten */
+            gap: 5px;
             text-align: center;
             font-weight: bold;
         }
 
-        .stat-item { padding: 5px; border-bottom: 2px solid #eee; }
-        .record-item { font-size: 0.85rem; color: #7f8c8d; padding-top: 5px; }
+        .stat-item { padding: 5px; font-size: 0.9rem; border-bottom: 1px solid #eee; }
+        .stat-label { display: block; font-size: 0.7rem; color: #7f8c8d; text-transform: uppercase; }
+        
+        .records-row {
+            grid-column: span 3;
+            display: flex;
+            justify-content: space-around;
+            padding-top: 8px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
 
+        /* HET RASTER */
         #grid {
             display: grid;
             grid-template-columns: repeat(var(--grid-size), 1fr); 
@@ -72,6 +85,7 @@
             width: 100%;
             max-width: 500px; 
             box-sizing: border-box;
+            display: none;
         }
 
         .cell {
@@ -80,17 +94,17 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: calc(35vw / var(--grid-size));
+            font-size: calc(40vw / var(--grid-size));
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
-            transition: all 0.2s;
             color: #2c3e50;
+            user-select: none;
         }
 
-        @media (min-width: 500px) { .cell { font-size: 22px; } }
+        @media (min-width: 500px) { .cell { font-size: 24px; } }
 
-        .cell.selected { background-color: #3498db; color: white; transform: scale(1.05); }
+        .cell.selected { background-color: #3498db; color: white; }
         .cell.error { background-color: #e74c3c !important; color: white !important; animation: shake 0.3s; }
 
         @keyframes shake {
@@ -101,6 +115,7 @@
 
         .cell.hidden { visibility: hidden; pointer-events: none; }
 
+        /* KNOPPEN */
         .level-btn {
             margin: 10px 0;
             padding: 15px;
@@ -111,82 +126,91 @@
             border-radius: 10px;
             width: 100%;
             font-weight: bold;
-            transition: transform 0.1s;
         }
-        .level-btn:active { transform: scale(0.95); }
         .btn-easy { background-color: #27ae60; }
         .btn-medium { background-color: #f39c12; }
         .btn-hard { background-color: #e74c3c; }
 
         #message {
-            margin: 15px 0;
-            font-size: 1.2rem;
+            margin: 10px 0;
+            font-size: 1.1rem;
             color: #2c3e50;
             font-weight: bold;
             text-align: center;
-            min-height: 1.6rem;
+            min-height: 1.5rem;
         }
 
         .menu-nav-btn {
+            display: none;
             margin-top: 10px;
             padding: 10px 20px;
             background: #95a5a6;
             color: white;
             border: none;
             border-radius: 5px;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- STAP 1: LEVEL KIEZEN -->
     <div id="menu-overlay">
         <div class="menu-box">
-            <h1 style="margin-top:0; color:#2c3e50;">Som van 10</h1>
-            <p>Welkom Louie! Kies een niveau:</p>
+            <h1 style="margin:0 0 10px 0; color:#2c3e50;">Som van 10</h1>
+            <p>Kies een niveau, Louie:</p>
             <button class="level-btn btn-easy" onclick="startGame(6)">Makkelijk (6x6)</button>
             <button class="level-btn btn-medium" onclick="startGame(8)">Gemiddeld (8x8)</button>
             <button class="level-btn btn-hard" onclick="startGame(10)">Moeilijk (10x10)</button>
         </div>
     </div>
 
-    <!-- STAP 2: HET SPEL -->
     <div id="ui-container">
         <div class="stats-grid">
-            <div class="stat-item">Punten: <span id="score">0</span></div>
-            <div class="stat-item">Tijd: <span id="timer">0</span>s</div>
-            <div class="record-item">Topscore: <span id="highscore">0</span></div>
-            <div class="record-item">Toptijd: <span id="besttime">--</span>s</div>
+            <div class="stat-item"><span class="stat-label">Punten</span><span id="score">0</span></div>
+            <div class="stat-item"><span class="stat-label">Tijd</span><span id="timer">0</span>s</div>
+            <div class="stat-item" style="color: #e74c3c;"><span class="stat-label">Fouten</span><span id="wrong-count">0</span></div>
+            
+            <div class="records-row">
+                <div>Topscore: <span id="highscore">0</span></div>
+                <div>Toptijd: <span id="besttime">--</span>s</div>
+            </div>
         </div>
     </div>
 
     <div id="grid"></div>
-
     <div id="message"></div>
-    <button class="menu-nav-btn" onclick="showMenu()">Naar Menu</button>
+    <button id="back-btn" class="menu-nav-btn" onclick="showMenu()">Naar Menu</button>
 
     <script>
         const gridElement = document.getElementById('grid');
         const scoreElement = document.getElementById('score');
         const timerElement = document.getElementById('timer');
+        const wrongElement = document.getElementById('wrong-count');
         const highscoreElement = document.getElementById('highscore');
         const besttimeElement = document.getElementById('besttime');
         const messageElement = document.getElementById('message');
         const menuOverlay = document.getElementById('menu-overlay');
+        const uiContainer = document.getElementById('ui-container');
+        const backBtn = document.getElementById('back-btn');
         
         let score = 0;
         let seconds = 0;
+        let wrongMoves = 0;
         let timerInterval;
         let selectedCell = null;
         let lastPairTime = 0;
         let gameActive = false;
         let currentSize = 10;
+        let audioCtx = null;
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
 
         function playErrorSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sawtooth';
@@ -202,23 +226,32 @@
         function speak(text) {
             const msg = new SpeechSynthesisUtterance();
             msg.text = text;
+            msg.lang = 'nl-BE';
             const voices = window.speechSynthesis.getVoices();
             const voice = voices.find(v => v.lang === 'nl-BE') || voices.find(v => v.lang === 'nl-NL');
             if (voice) msg.voice = voice;
-            msg.lang = 'nl-BE';
             window.speechSynthesis.speak(msg);
         }
 
         function showMenu() {
             menuOverlay.style.display = 'flex';
+            uiContainer.style.display = 'none';
+            gridElement.style.display = 'none';
+            backBtn.style.display = 'none';
             clearInterval(timerInterval);
             gameActive = false;
         }
 
         function startGame(size) {
+            initAudio();
             currentSize = size;
             document.documentElement.style.setProperty('--grid-size', size);
+            
             menuOverlay.style.display = 'none';
+            uiContainer.style.display = 'block';
+            gridElement.style.display = 'grid';
+            backBtn.style.display = 'block';
+            
             initGame();
         }
 
@@ -226,13 +259,15 @@
             gridElement.innerHTML = '';
             score = 0;
             seconds = 0;
+            wrongMoves = 0;
             gameActive = true;
             lastPairTime = Date.now();
             scoreElement.innerText = score;
             timerElement.innerText = seconds;
+            wrongElement.innerText = wrongMoves;
             messageElement.innerText = '';
+            selectedCell = null;
             
-            // Laad records voor dit level
             const savedHighscore = localStorage.getItem('highscore_' + currentSize) || 0;
             const savedBestTime = localStorage.getItem('besttime_' + currentSize) || "--";
             highscoreElement.innerText = savedHighscore;
@@ -244,7 +279,7 @@
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.innerText = val;
-                cell.onclick = () => handleCellClick(cell);
+                cell.addEventListener('click', () => handleCellClick(cell));
                 gridElement.appendChild(cell);
             }
 
@@ -257,7 +292,7 @@
 
         function handleCellClick(cell) {
             if (!gameActive || cell.classList.contains('hidden') || cell.classList.contains('error')) return;
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            initAudio();
 
             if (selectedCell === cell) {
                 cell.classList.remove('selected');
@@ -285,6 +320,10 @@
                     c1.classList.add('error');
                     c2.classList.add('error');
                     c1.classList.remove('selected');
+                    
+                    wrongMoves++;
+                    wrongElement.innerText = wrongMoves;
+                    
                     playErrorSound();
                     calculateScore(false);
                     selectedCell = null;
@@ -331,14 +370,11 @@
                 const oldBestTime = parseInt(localStorage.getItem('besttime_' + currentSize) || 999999);
                 let speech = "Game over. Goed gedaan Louie!";
 
-                // Check Topscore
                 if (score > oldHighscore) {
                     localStorage.setItem('highscore_' + currentSize, score);
                     speech = "Nieuwe topscore voor Louie! Geweldig gedaan!";
                 }
 
-                // Check Toptijd (alleen als het veld helemaal leeg is, of altijd?)
-                // We doen het altijd als het spel eindigt:
                 if (seconds < oldBestTime) {
                     localStorage.setItem('besttime_' + currentSize, seconds);
                     besttimeElement.innerText = seconds;
@@ -349,13 +385,12 @@
                     }
                 }
 
-                messageElement.innerText = "Goed gedaan Louie!";
+                messageElement.innerText = "Klaar! Fouten: " + wrongMoves;
                 speak(speech);
             }
         }
 
-        // Zorg dat stemmen geladen zijn
-        window.speechSynthesis.onvoiceschanged = () => {};
+        window.speechSynthesis.getVoices();
     </script>
 </body>
 </html>
