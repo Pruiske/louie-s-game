@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Som van 10 - Het Spel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #ui-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 40px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .stat {
+            color: #2c3e50;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(10, 50px);
+            grid-template-rows: repeat(10, 50px);
+            gap: 5px;
+            background-color: #bdc3c7;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .cell {
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            user-select: none;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        .cell:hover {
+            background-color: #ecf0f1;
+        }
+
+        .cell.selected {
+            background-color: #3498db;
+            color: white;
+            transform: scale(1.1);
+            z-index: 2;
+        }
+
+        .cell.hidden {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #e74c3c;
+            height: 30px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #219150;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-container">
+        <div class="stat">Punten: <span id="score">0</span></div>
+        <div class="stat">Tijd: <span id="timer">0</span>s</div>
+    </div>
+
+    <div id="grid"></div>
+
+    <div id="message"></div>
+    <button onclick="resetGame()">Nieuw Spel</button>
+
+    <script>
+        const gridElement = document.getElementById('grid');
+        const scoreElement = document.getElementById('score');
+        const timerElement = document.getElementById('timer');
+        const messageElement = document.getElementById('message');
+        
+        let score = 0;
+        let seconds = 0;
+        let timerInterval;
+        let selectedCell = null;
+        let lastPairTime = 0;
+        let numbers = [];
+
+        function initGame() {
+            gridElement.innerHTML = '';
+            numbers = [];
+            score = 0;
+            seconds = 0;
+            lastPairTime = 0;
+            scoreElement.innerText = score;
+            timerElement.innerText = seconds;
+            messageElement.innerText = '';
+            
+            // Vul het raster (10x10)
+            for (let i = 0; i < 100; i++) {
+                const val = Math.floor(Math.random() * 9) + 1;
+                numbers.push(val);
+                
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.innerText = val;
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => handleCellClick(cell));
+                gridElement.appendChild(cell);
+            }
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                seconds++;
+                timerElement.innerText = seconds;
+            }, 1000);
+
+            lastPairTime = Date.now();
+        }
+
+        function handleCellClick(cell) {
+            if (cell.classList.contains('hidden')) return;
+
+            // Als we dezelfde cel nogmaals aanklikken, deselecteer
+            if (selectedCell === cell) {
+                cell.classList.remove('selected');
+                selectedCell = null;
+                return;
+            }
+
+            if (!selectedCell) {
+                // Eerste getal van het paar
+                selectedCell = cell;
+                cell.classList.add('selected');
+            } else {
+                // Tweede getal van het paar
+                const val1 = parseInt(selectedCell.innerText);
+                const val2 = parseInt(cell.innerText);
+
+                if (val1 + val2 === 10) {
+                    // Correct paar!
+                    calculateScore();
+                    
+                    selectedCell.classList.add('hidden');
+                    cell.classList.add('hidden');
+                    
+                    selectedCell.classList.remove('selected');
+                    selectedCell = null;
+
+                    checkGameOver();
+                } else {
+                    // Fout paar
+                    selectedCell.classList.remove('selected');
+                    cell.classList.add('selected');
+                    selectedCell = cell;
+                }
+            }
+        }
+
+        function calculateScore() {
+            const now = Date.now();
+            const timeDiff = (now - lastPairTime) / 1000; // tijd in seconden
+            
+            // Score berekening: Hoe sneller, hoe meer punten. 
+            // Basis is 100, we trekken 5 punten af per seconde, met een minimum van 10.
+            let points = Math.max(10, Math.floor(100 - (timeDiff * 5)));
+            
+            score += points;
+            scoreElement.innerText = score;
+            lastPairTime = now;
+        }
+
+        function checkGameOver() {
+            const activeCells = Array.from(document.querySelectorAll('.cell:not(.hidden)'));
+            
+            // Check of er nog paren mogelijk zijn
+            let possibleMatch = false;
+            for (let i = 0; i < activeCells.length; i++) {
+                for (let j = i + 1; j < activeCells.length; j++) {
+                    if (parseInt(activeCells[i].innerText) + parseInt(activeCells[j].innerText) === 10) {
+                        possibleMatch = true;
+                        break;
+                    }
+                }
+                if (possibleMatch) break;
+            }
+
+            if (!possibleMatch) {
+                clearInterval(timerInterval);
+                if (activeCells.length === 0) {
+                    messageElement.innerText = "Gefeliciteerd! Je hebt het hele veld leeg!";
+                } else {
+                    messageElement.innerText = "Game Over! Geen combinaties meer mogelijk.";
+                }
+            }
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        // Start het spel bij laden
+        initGame();
+    </script>
+</body>
+</html>
