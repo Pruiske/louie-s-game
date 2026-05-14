@@ -2,8 +2,8 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Som van 10 - Het Spel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Som van 10 - Louie's Edit</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,59 +12,73 @@
             align-items: center;
             background-color: #f0f2f5;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
+            touch-action: manipulation;
         }
 
         #ui-container {
             background: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
-            gap: 40px;
-            font-size: 24px;
+            gap: 20px;
+            font-size: 1.2rem;
             font-weight: bold;
-        }
-
-        .stat {
-            color: #2c3e50;
+            width: 100%;
+            max-width: 400px;
+            justify-content: space-around;
+            box-sizing: border-box;
         }
 
         #grid {
             display: grid;
-            grid-template-columns: repeat(10, 50px);
-            grid-template-rows: repeat(10, 50px);
-            gap: 5px;
+            grid-template-columns: repeat(10, 1fr); 
+            gap: 4px;
             background-color: #bdc3c7;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
+            width: 100%;
+            max-width: 500px; 
+            box-sizing: border-box;
         }
 
         .cell {
-            width: 50px;
-            height: 50px;
+            aspect-ratio: 1 / 1; 
             background-color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
+            font-size: min(4.5vw, 20px);
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
             user-select: none;
-            transition: transform 0.1s, background-color 0.2s;
-        }
-
-        .cell:hover {
-            background-color: #ecf0f1;
+            transition: all 0.2s;
+            color: #2c3e50;
         }
 
         .cell.selected {
             background-color: #3498db;
             color: white;
-            transform: scale(1.1);
+            transform: scale(1.05);
             z-index: 2;
+        }
+
+        /* Foutmelding stijl */
+        .cell.error {
+            background-color: #e74c3c !important;
+            color: white !important;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+            75% { transform: translateX(-4px); }
+            100% { transform: translateX(0); }
         }
 
         .cell.hidden {
@@ -73,32 +87,37 @@
         }
 
         #message {
-            margin-top: 20px;
-            font-size: 20px;
-            color: #e74c3c;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            color: #2c3e50;
             height: 30px;
+            text-align: center;
+            font-weight: bold;
         }
 
         button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
+            margin-top: 10px;
+            padding: 12px 25px;
+            font-size: 1rem;
             cursor: pointer;
             background-color: #27ae60;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 200px;
         }
 
-        button:hover {
-            background-color: #219150;
+        @media (max-width: 350px) {
+            #ui-container { font-size: 1rem; }
+            #grid { gap: 2px; padding: 4px; }
         }
     </style>
 </head>
 <body>
 
     <div id="ui-container">
-        <div class="stat">Punten: <span id="score">0</span></div>
+        <div class="stat">Score: <span id="score">0</span></div>
         <div class="stat">Tijd: <span id="timer">0</span>s</div>
     </div>
 
@@ -118,28 +137,51 @@
         let timerInterval;
         let selectedCell = null;
         let lastPairTime = 0;
-        let numbers = [];
+        let gameActive = true;
+
+        // Audio Context voor een 'beep' geluid zonder extern bestand
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playErrorSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime); // Lage toon
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function speak(text) {
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            // Zoek naar een Vlaamse/Nederlandse stem
+            const voices = window.speechSynthesis.getVoices();
+            const flemishVoice = voices.find(v => v.lang === 'nl-BE') || voices.find(v => v.lang === 'nl-NL');
+            if (flemishVoice) msg.voice = flemishVoice;
+            msg.lang = 'nl-BE';
+            window.speechSynthesis.speak(msg);
+        }
 
         function initGame() {
             gridElement.innerHTML = '';
-            numbers = [];
             score = 0;
             seconds = 0;
-            lastPairTime = 0;
+            gameActive = true;
+            lastPairTime = Date.now();
             scoreElement.innerText = score;
             timerElement.innerText = seconds;
             messageElement.innerText = '';
             
-            // Vul het raster (10x10)
             for (let i = 0; i < 100; i++) {
                 const val = Math.floor(Math.random() * 9) + 1;
-                numbers.push(val);
-                
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.innerText = val;
-                cell.dataset.index = i;
-                cell.addEventListener('click', () => handleCellClick(cell));
+                cell.onclick = () => handleCellClick(cell);
                 gridElement.appendChild(cell);
             }
 
@@ -148,14 +190,14 @@
                 seconds++;
                 timerElement.innerText = seconds;
             }, 1000);
-
-            lastPairTime = Date.now();
         }
 
         function handleCellClick(cell) {
-            if (cell.classList.contains('hidden')) return;
+            if (!gameActive || cell.classList.contains('hidden') || cell.classList.contains('error')) return;
 
-            // Als we dezelfde cel nogmaals aanklikken, deselecteer
+            // Browser audio ontgrendelen (nodig voor sommige mobiele browsers)
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
             if (selectedCell === cell) {
                 cell.classList.remove('selected');
                 selectedCell = null;
@@ -163,52 +205,60 @@
             }
 
             if (!selectedCell) {
-                // Eerste getal van het paar
                 selectedCell = cell;
                 cell.classList.add('selected');
             } else {
-                // Tweede getal van het paar
                 const val1 = parseInt(selectedCell.innerText);
                 const val2 = parseInt(cell.innerText);
 
                 if (val1 + val2 === 10) {
-                    // Correct paar!
-                    calculateScore();
-                    
+                    // GOED
+                    calculateScore(true);
                     selectedCell.classList.add('hidden');
                     cell.classList.add('hidden');
-                    
                     selectedCell.classList.remove('selected');
                     selectedCell = null;
-
                     checkGameOver();
                 } else {
-                    // Fout paar
-                    selectedCell.classList.remove('selected');
-                    cell.classList.add('selected');
-                    selectedCell = cell;
+                    // FOUT
+                    const firstCell = selectedCell;
+                    const secondCell = cell;
+                    
+                    firstCell.classList.add('error');
+                    secondCell.classList.add('error');
+                    firstCell.classList.remove('selected');
+                    
+                    playErrorSound();
+                    calculateScore(false);
+
+                    selectedCell = null;
+
+                    setTimeout(() => {
+                        firstCell.classList.remove('error');
+                        secondCell.classList.remove('error');
+                    }, 500);
                 }
             }
         }
 
-        function calculateScore() {
-            const now = Date.now();
-            const timeDiff = (now - lastPairTime) / 1000; // tijd in seconden
-            
-            // Score berekening: Hoe sneller, hoe meer punten. 
-            // Basis is 100, we trekken 5 punten af per seconde, met een minimum van 10.
-            let points = Math.max(10, Math.floor(100 - (timeDiff * 5)));
-            
-            score += points;
+        function calculateScore(isCorrect) {
+            if (isCorrect) {
+                const now = Date.now();
+                const timeDiff = (now - lastPairTime) / 1000;
+                let points = Math.max(10, Math.floor(100 - (timeDiff * 5)));
+                score += points;
+                lastPairTime = now;
+            } else {
+                // Strafpunten: -20 bij een fout
+                score = Math.max(0, score - 20);
+            }
             scoreElement.innerText = score;
-            lastPairTime = now;
         }
 
         function checkGameOver() {
             const activeCells = Array.from(document.querySelectorAll('.cell:not(.hidden)'));
-            
-            // Check of er nog paren mogelijk zijn
             let possibleMatch = false;
+            
             for (let i = 0; i < activeCells.length; i++) {
                 for (let j = i + 1; j < activeCells.length; j++) {
                     if (parseInt(activeCells[i].innerText) + parseInt(activeCells[j].innerText) === 10) {
@@ -220,12 +270,11 @@
             }
 
             if (!possibleMatch) {
+                gameActive = false;
                 clearInterval(timerInterval);
-                if (activeCells.length === 0) {
-                    messageElement.innerText = "Gefeliciteerd! Je hebt het hele veld leeg!";
-                } else {
-                    messageElement.innerText = "Game Over! Geen combinaties meer mogelijk.";
-                }
+                const finalMsg = "Game over. Goed gedaan Louie!";
+                messageElement.innerText = finalMsg;
+                speak(finalMsg);
             }
         }
 
@@ -233,7 +282,9 @@
             initGame();
         }
 
-        // Start het spel bij laden
+        // Stemmen laden kan even duren in sommige browsers
+        window.speechSynthesis.onvoiceschanged = () => {};
+
         initGame();
     </script>
 </body>
