@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Som van 10 - Levels & Topscores</title>
+    <title>Som van 10 - Louie's Game</title>
     <style>
-        :root {
-            --grid-size: 10;
-        }
+        :root { --grid-size: 10; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,60 +18,52 @@
             touch-action: manipulation;
         }
 
-        /* Startmenu / Overlay */
+        /* STARTMENU - Dit staat over alles heen aan het begin */
         #menu-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(240, 242, 245, 0.95);
+            background: #f0f2f5;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 9999;
             text-align: center;
         }
 
-        .menu-content {
+        .menu-box {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 80%;
-            max-width: 300px;
+            padding: 40px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            width: 85%;
+            max-width: 350px;
         }
 
         #ui-container {
             background: white;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 12px;
+            border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             box-sizing: border-box;
         }
 
-        .stats-row {
-            display: flex;
-            justify-content: space-around;
-            font-size: 1.1rem;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: center;
             font-weight: bold;
         }
 
-        .highscore-label {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            text-align: center;
-            border-top: 1px solid #eee;
-            padding-top: 5px;
-        }
+        .stat-item { padding: 5px; border-bottom: 2px solid #eee; }
+        .record-item { font-size: 0.85rem; color: #7f8c8d; padding-top: 5px; }
 
         #grid {
             display: grid;
-            /* Dynamisch aantal kolommen via JS */
             grid-template-columns: repeat(var(--grid-size), 1fr); 
             gap: 4px;
             background-color: #bdc3c7;
@@ -90,16 +80,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: calc(30vw / var(--grid-size)); /* Tekst past zich aan raster aan */
+            font-size: calc(35vw / var(--grid-size));
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
-            user-select: none;
             transition: all 0.2s;
             color: #2c3e50;
         }
 
-        @media (min-width: 500px) { .cell { font-size: 20px; } }
+        @media (min-width: 500px) { .cell { font-size: 22px; } }
 
         .cell.selected { background-color: #3498db; color: white; transform: scale(1.05); }
         .cell.error { background-color: #e74c3c !important; color: white !important; animation: shake 0.3s; }
@@ -112,63 +101,77 @@
 
         .cell.hidden { visibility: hidden; pointer-events: none; }
 
-        button {
+        .level-btn {
             margin: 10px 0;
-            padding: 12px;
-            font-size: 1rem;
+            padding: 15px;
+            font-size: 1.1rem;
             cursor: pointer;
-            background-color: #27ae60;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             width: 100%;
             font-weight: bold;
+            transition: transform 0.1s;
         }
-
-        button.btn-easy { background-color: #27ae60; }
-        button.btn-medium { background-color: #f39c12; }
-        button.btn-hard { background-color: #e74c3c; }
+        .level-btn:active { transform: scale(0.95); }
+        .btn-easy { background-color: #27ae60; }
+        .btn-medium { background-color: #f39c12; }
+        .btn-hard { background-color: #e74c3c; }
 
         #message {
-            margin-top: 10px;
-            font-size: 1.1rem;
+            margin: 15px 0;
+            font-size: 1.2rem;
             color: #2c3e50;
             font-weight: bold;
             text-align: center;
-            min-height: 1.5rem;
+            min-height: 1.6rem;
+        }
+
+        .menu-nav-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
+    <!-- STAP 1: LEVEL KIEZEN -->
     <div id="menu-overlay">
-        <div class="menu-content">
-            <h2>Som van 10</h2>
-            <p>Kies een niveau:</p>
-            <button class="btn-easy" onclick="startGame(6)">Makkelijk (6x6)</button>
-            <button class="btn-medium" onclick="startGame(8)">Gemiddeld (8x8)</button>
-            <button class="btn-hard" onclick="startGame(10)">Moeilijk (10x10)</button>
+        <div class="menu-box">
+            <h1 style="margin-top:0; color:#2c3e50;">Som van 10</h1>
+            <p>Welkom Louie! Kies een niveau:</p>
+            <button class="level-btn btn-easy" onclick="startGame(6)">Makkelijk (6x6)</button>
+            <button class="level-btn btn-medium" onclick="startGame(8)">Gemiddeld (8x8)</button>
+            <button class="level-btn btn-hard" onclick="startGame(10)">Moeilijk (10x10)</button>
         </div>
     </div>
 
+    <!-- STAP 2: HET SPEL -->
     <div id="ui-container">
-        <div class="stats-row">
-            <div>Score: <span id="score">0</span></div>
-            <div>Tijd: <span id="timer">0</span>s</div>
+        <div class="stats-grid">
+            <div class="stat-item">Punten: <span id="score">0</span></div>
+            <div class="stat-item">Tijd: <span id="timer">0</span>s</div>
+            <div class="record-item">Topscore: <span id="highscore">0</span></div>
+            <div class="record-item">Toptijd: <span id="besttime">--</span>s</div>
         </div>
-        <div class="highscore-label">Persoonlijk record (dit level): <span id="highscore">0</span></div>
     </div>
 
     <div id="grid"></div>
 
     <div id="message"></div>
-    <button onclick="showMenu()" style="background-color: #95a5a6; max-width: 200px;">Menu</button>
+    <button class="menu-nav-btn" onclick="showMenu()">Naar Menu</button>
 
     <script>
         const gridElement = document.getElementById('grid');
         const scoreElement = document.getElementById('score');
         const timerElement = document.getElementById('timer');
         const highscoreElement = document.getElementById('highscore');
+        const besttimeElement = document.getElementById('besttime');
         const messageElement = document.getElementById('message');
         const menuOverlay = document.getElementById('menu-overlay');
         
@@ -229,9 +232,11 @@
             timerElement.innerText = seconds;
             messageElement.innerText = '';
             
-            // Laad topscore voor dit specifieke level
+            // Laad records voor dit level
             const savedHighscore = localStorage.getItem('highscore_' + currentSize) || 0;
+            const savedBestTime = localStorage.getItem('besttime_' + currentSize) || "--";
             highscoreElement.innerText = savedHighscore;
+            besttimeElement.innerText = savedBestTime;
 
             const totalCells = currentSize * currentSize;
             for (let i = 0; i < totalCells; i++) {
@@ -252,9 +257,105 @@
 
         function handleCellClick(cell) {
             if (!gameActive || cell.classList.contains('hidden') || cell.classList.contains('error')) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
 
             if (selectedCell === cell) {
                 cell.classList.remove('selected');
                 selectedCell = null;
                 return;
-  
+            }
+
+            if (!selectedCell) {
+                selectedCell = cell;
+                cell.classList.add('selected');
+            } else {
+                const val1 = parseInt(selectedCell.innerText);
+                const val2 = parseInt(cell.innerText);
+
+                if (val1 + val2 === 10) {
+                    calculateScore(true);
+                    selectedCell.classList.add('hidden');
+                    cell.classList.add('hidden');
+                    selectedCell.classList.remove('selected');
+                    selectedCell = null;
+                    checkGameOver();
+                } else {
+                    const c1 = selectedCell;
+                    const c2 = cell;
+                    c1.classList.add('error');
+                    c2.classList.add('error');
+                    c1.classList.remove('selected');
+                    playErrorSound();
+                    calculateScore(false);
+                    selectedCell = null;
+                    setTimeout(() => {
+                        c1.classList.remove('error');
+                        c2.classList.remove('error');
+                    }, 400);
+                }
+            }
+        }
+
+        function calculateScore(isCorrect) {
+            if (isCorrect) {
+                const now = Date.now();
+                const timeDiff = (now - lastPairTime) / 1000;
+                let points = Math.max(10, Math.floor(100 - (timeDiff * 5)));
+                score += points;
+                lastPairTime = now;
+            } else {
+                score = Math.max(0, score - 20);
+            }
+            scoreElement.innerText = score;
+        }
+
+        function checkGameOver() {
+            const activeCells = Array.from(document.querySelectorAll('.cell:not(.hidden)'));
+            let possibleMatch = false;
+            
+            for (let i = 0; i < activeCells.length; i++) {
+                for (let j = i + 1; j < activeCells.length; j++) {
+                    if (parseInt(activeCells[i].innerText) + parseInt(activeCells[j].innerText) === 10) {
+                        possibleMatch = true;
+                        break;
+                    }
+                }
+                if (possibleMatch) break;
+            }
+
+            if (!possibleMatch) {
+                gameActive = false;
+                clearInterval(timerInterval);
+                
+                const oldHighscore = parseInt(localStorage.getItem('highscore_' + currentSize) || 0);
+                const oldBestTime = parseInt(localStorage.getItem('besttime_' + currentSize) || 999999);
+                let speech = "Game over. Goed gedaan Louie!";
+
+                // Check Topscore
+                if (score > oldHighscore) {
+                    localStorage.setItem('highscore_' + currentSize, score);
+                    speech = "Nieuwe topscore voor Louie! Geweldig gedaan!";
+                }
+
+                // Check Toptijd (alleen als het veld helemaal leeg is, of altijd?)
+                // We doen het altijd als het spel eindigt:
+                if (seconds < oldBestTime) {
+                    localStorage.setItem('besttime_' + currentSize, seconds);
+                    besttimeElement.innerText = seconds;
+                    if (score > oldHighscore) {
+                        speech = "Een dubbel record voor Louie! Beste score en beste tijd!";
+                    } else {
+                        speech = "Een nieuwe recordtijd voor Louie! Wat ben je snel!";
+                    }
+                }
+
+                messageElement.innerText = "Goed gedaan Louie!";
+                speak(speech);
+            }
+        }
+
+        // Zorg dat stemmen geladen zijn
+        window.speechSynthesis.onvoiceschanged = () => {};
+    </script>
+</body>
+</html>
