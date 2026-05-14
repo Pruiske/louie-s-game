@@ -41,37 +41,47 @@
             text-align: center;
         }
 
-        /* STATISTIEKEN BOVENAAN */
+        /* STATISTIEKEN BALK */
         #ui-container {
             background: white;
-            padding: 12px;
+            padding: 15px;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             margin-bottom: 10px;
             width: 100%;
             max-width: 500px;
             box-sizing: border-box;
-            display: none;
+            display: none; /* Wordt zichtbaar bij start */
         }
 
-        .stats-grid {
+        .stats-main {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 kolommen voor Score, Tijd, Fouten */
-            gap: 5px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             font-weight: bold;
         }
 
-        .stat-item { padding: 5px; font-size: 0.9rem; border-bottom: 1px solid #eee; }
-        .stat-label { display: block; font-size: 0.7rem; color: #7f8c8d; text-transform: uppercase; }
+        .stat-value { font-size: 1.2rem; color: #2c3e50; }
+        .stat-label { font-size: 0.7rem; color: #7f8c8d; text-transform: uppercase; }
         
+        /* Specifieke stijl voor de foutenteller */
+        .wrong-stat { color: #e74c3c; border-left: 1px solid #eee; border-right: 1px solid #eee; }
+
         .records-row {
-            grid-column: span 3;
             display: flex;
             justify-content: space-around;
-            padding-top: 8px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
             font-size: 0.8rem;
-            color: #7f8c8d;
+            color: #95a5a6;
         }
 
         /* HET RASTER */
@@ -94,7 +104,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: calc(40vw / var(--grid-size));
+            font-size: calc(45vw / var(--grid-size));
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
@@ -143,36 +153,48 @@
         .menu-nav-btn {
             display: none;
             margin-top: 10px;
-            padding: 10px 20px;
+            padding: 12px 25px;
             background: #95a5a6;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
+    <!-- STAP 1: MENU -->
     <div id="menu-overlay">
         <div class="menu-box">
             <h1 style="margin:0 0 10px 0; color:#2c3e50;">Som van 10</h1>
-            <p>Kies een niveau, Louie:</p>
+            <p>Welkom Louie! Kies een niveau:</p>
             <button class="level-btn btn-easy" onclick="startGame(6)">Makkelijk (6x6)</button>
             <button class="level-btn btn-medium" onclick="startGame(8)">Gemiddeld (8x8)</button>
             <button class="level-btn btn-hard" onclick="startGame(10)">Moeilijk (10x10)</button>
         </div>
     </div>
 
+    <!-- STAP 2: SPEL INFORMATIE -->
     <div id="ui-container">
-        <div class="stats-grid">
-            <div class="stat-item"><span class="stat-label">Punten</span><span id="score">0</span></div>
-            <div class="stat-item"><span class="stat-label">Tijd</span><span id="timer">0</span>s</div>
-            <div class="stat-item" style="color: #e74c3c;"><span class="stat-label">Fouten</span><span id="wrong-count">0</span></div>
-            
-            <div class="records-row">
-                <div>Topscore: <span id="highscore">0</span></div>
-                <div>Toptijd: <span id="besttime">--</span>s</div>
+        <div class="stats-main">
+            <div class="stat-box">
+                <span class="stat-label">Punten</span>
+                <span id="score" class="stat-value">0</span>
             </div>
+            <div class="stat-box wrong-stat">
+                <span class="stat-label">Fouten</span>
+                <span id="wrong-count" class="stat-value">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Tijd</span>
+                <span id="timer" class="stat-value">0</span><span style="font-size:0.7rem">sec</span>
+            </div>
+        </div>
+        
+        <div class="records-row">
+            <div>Best: <span id="highscore">0</span> pts</div>
+            <div>Snelst: <span id="besttime">--</span>s</div>
         </div>
     </div>
 
@@ -262,9 +284,10 @@
             wrongMoves = 0;
             gameActive = true;
             lastPairTime = Date.now();
-            scoreElement.innerText = score;
-            timerElement.innerText = seconds;
-            wrongElement.innerText = wrongMoves;
+            
+            scoreElement.innerText = "0";
+            timerElement.innerText = "0";
+            wrongElement.innerText = "0";
             messageElement.innerText = '';
             selectedCell = null;
             
@@ -308,6 +331,7 @@
                 const val2 = parseInt(cell.innerText);
 
                 if (val1 + val2 === 10) {
+                    // GOED
                     calculateScore(true);
                     selectedCell.classList.add('hidden');
                     cell.classList.add('hidden');
@@ -315,6 +339,7 @@
                     selectedCell = null;
                     checkGameOver();
                 } else {
+                    // FOUT
                     const c1 = selectedCell;
                     const c2 = cell;
                     c1.classList.add('error');
@@ -359,38 +384,4 @@
                         break;
                     }
                 }
-                if (possibleMatch) break;
-            }
-
-            if (!possibleMatch) {
-                gameActive = false;
-                clearInterval(timerInterval);
-                
-                const oldHighscore = parseInt(localStorage.getItem('highscore_' + currentSize) || 0);
-                const oldBestTime = parseInt(localStorage.getItem('besttime_' + currentSize) || 999999);
-                let speech = "Game over. Goed gedaan Louie!";
-
-                if (score > oldHighscore) {
-                    localStorage.setItem('highscore_' + currentSize, score);
-                    speech = "Nieuwe topscore voor Louie! Geweldig gedaan!";
-                }
-
-                if (seconds < oldBestTime) {
-                    localStorage.setItem('besttime_' + currentSize, seconds);
-                    besttimeElement.innerText = seconds;
-                    if (score > oldHighscore) {
-                        speech = "Een dubbel record voor Louie! Beste score en beste tijd!";
-                    } else {
-                        speech = "Een nieuwe recordtijd voor Louie! Wat ben je snel!";
-                    }
-                }
-
-                messageElement.innerText = "Klaar! Fouten: " + wrongMoves;
-                speak(speech);
-            }
-        }
-
-        window.speechSynthesis.getVoices();
-    </script>
-</body>
-</html>
+           
