@@ -2,21 +2,29 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Apple Web App instellingen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Som van 10">
+    
     <title>Som van 10 - Louie's Game</title>
     <style>
         :root { --grid-size: 10; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             background-color: #f0f2f5;
             margin: 0;
-            padding: 10px;
+            padding: env(safe-area-inset-top) 10px 20px 10px;
             touch-action: manipulation;
             overflow-x: hidden;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         /* STARTMENU */
@@ -41,7 +49,6 @@
             text-align: center;
         }
 
-        /* STATISTIEKEN BALK */
         #ui-container {
             background: white;
             padding: 15px;
@@ -51,7 +58,7 @@
             width: 100%;
             max-width: 500px;
             box-sizing: border-box;
-            display: none; /* Wordt zichtbaar bij start */
+            display: none;
         }
 
         .stats-main {
@@ -62,17 +69,9 @@
             margin-bottom: 10px;
         }
 
-        .stat-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-weight: bold;
-        }
-
+        .stat-box { display: flex; flex-direction: column; align-items: center; font-weight: bold; }
         .stat-value { font-size: 1.2rem; color: #2c3e50; }
         .stat-label { font-size: 0.7rem; color: #7f8c8d; text-transform: uppercase; }
-        
-        /* Specifieke stijl voor de foutenteller */
         .wrong-stat { color: #e74c3c; border-left: 1px solid #eee; border-right: 1px solid #eee; }
 
         .records-row {
@@ -84,7 +83,6 @@
             color: #95a5a6;
         }
 
-        /* HET RASTER */
         #grid {
             display: grid;
             grid-template-columns: repeat(var(--grid-size), 1fr); 
@@ -109,7 +107,7 @@
             cursor: pointer;
             border-radius: 4px;
             color: #2c3e50;
-            user-select: none;
+            transition: background-color 0.1s;
         }
 
         @media (min-width: 500px) { .cell { font-size: 24px; } }
@@ -125,17 +123,17 @@
 
         .cell.hidden { visibility: hidden; pointer-events: none; }
 
-        /* KNOPPEN */
         .level-btn {
             margin: 10px 0;
-            padding: 15px;
-            font-size: 1.1rem;
+            padding: 18px;
+            font-size: 1.2rem;
             cursor: pointer;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 15px;
             width: 100%;
             font-weight: bold;
+            -webkit-appearance: none;
         }
         .btn-easy { background-color: #27ae60; }
         .btn-medium { background-color: #f39c12; }
@@ -157,25 +155,23 @@
             background: #95a5a6;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <!-- STAP 1: MENU -->
     <div id="menu-overlay">
         <div class="menu-box">
             <h1 style="margin:0 0 10px 0; color:#2c3e50;">Som van 10</h1>
-            <p>Welkom Louie! Kies een niveau:</p>
-            <button class="level-btn btn-easy" onclick="startGame(6)">Makkelijk (6x6)</button>
-            <button class="level-btn btn-medium" onclick="startGame(8)">Gemiddeld (8x8)</button>
-            <button class="level-btn btn-hard" onclick="startGame(10)">Moeilijk (10x10)</button>
+            <p>Welkom Louie!</p>
+            <button class="level-btn btn-easy" onclick="clickStart(6)">Makkelijk (6x6)</button>
+            <button class="level-btn btn-medium" onclick="clickStart(8)">Gemiddeld (8x8)</button>
+            <button class="level-btn btn-hard" onclick="clickStart(10)">Moeilijk (10x10)</button>
         </div>
     </div>
 
-    <!-- STAP 2: SPEL INFORMATIE -->
     <div id="ui-container">
         <div class="stats-main">
             <div class="stat-box">
@@ -188,21 +184,25 @@
             </div>
             <div class="stat-box">
                 <span class="stat-label">Tijd</span>
-                <span id="timer" class="stat-value">0</span><span style="font-size:0.7rem">sec</span>
+                <span id="timer" class="stat-value">0</span>
             </div>
         </div>
-        
         <div class="records-row">
-            <div>Best: <span id="highscore">0</span> pts</div>
+            <div>Record: <span id="highscore">0</span></div>
             <div>Snelst: <span id="besttime">--</span>s</div>
         </div>
     </div>
 
     <div id="grid"></div>
     <div id="message"></div>
-    <button id="back-btn" class="menu-nav-btn" onclick="showMenu()">Naar Menu</button>
+    <button id="back-btn" class="menu-nav-btn" onclick="showMenu()">Menu</button>
 
     <script>
+        // GLOBALE VARIABELEN
+        let score = 0, seconds = 0, wrongMoves = 0, timerInterval, selectedCell = null, 
+            lastPairTime = 0, gameActive = false, currentSize = 10, audioCtx = null;
+
+        // ELEMENTEN
         const gridElement = document.getElementById('grid');
         const scoreElement = document.getElementById('score');
         const timerElement = document.getElementById('timer');
@@ -213,46 +213,49 @@
         const menuOverlay = document.getElementById('menu-overlay');
         const uiContainer = document.getElementById('ui-container');
         const backBtn = document.getElementById('back-btn');
-        
-        let score = 0;
-        let seconds = 0;
-        let wrongMoves = 0;
-        let timerInterval;
-        let selectedCell = null;
-        let lastPairTime = 0;
-        let gameActive = false;
-        let currentSize = 10;
-        let audioCtx = null;
 
-        function initAudio() {
+        // iOS AUDIO UNLOCK
+        function clickStart(size) {
+            // 1. Initialiseer Audio direct op de klik
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
             if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            // 2. Initialiseer Spraak (stille start voor iOS)
+            const silentMsg = new SpeechSynthesisUtterance("");
+            window.speechSynthesis.speak(silentMsg);
+
+            // 3. Start het spel
+            startGame(size);
         }
 
         function playErrorSound() {
             if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-            osc.stop(audioCtx.currentTime + 0.2);
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch(e) { console.log("Audio error"); }
         }
 
         function speak(text) {
-            const msg = new SpeechSynthesisUtterance();
-            msg.text = text;
-            msg.lang = 'nl-BE';
-            const voices = window.speechSynthesis.getVoices();
-            const voice = voices.find(v => v.lang === 'nl-BE') || voices.find(v => v.lang === 'nl-NL');
-            if (voice) msg.voice = voice;
-            window.speechSynthesis.speak(msg);
+            try {
+                window.speechSynthesis.cancel(); // Stop lopende spraak
+                const msg = new SpeechSynthesisUtterance(text);
+                msg.lang = 'nl-BE';
+                const voices = window.speechSynthesis.getVoices();
+                const voice = voices.find(v => v.lang === 'nl-BE') || voices.find(v => v.lang === 'nl-NL');
+                if (voice) msg.voice = voice;
+                window.speechSynthesis.speak(msg);
+            } catch(e) { console.log("Speech error"); }
         }
 
         function showMenu() {
@@ -265,39 +268,31 @@
         }
 
         function startGame(size) {
-            initAudio();
             currentSize = size;
             document.documentElement.style.setProperty('--grid-size', size);
-            
             menuOverlay.style.display = 'none';
             uiContainer.style.display = 'block';
             gridElement.style.display = 'grid';
             backBtn.style.display = 'block';
-            
             initGame();
         }
 
         function initGame() {
             gridElement.innerHTML = '';
-            score = 0;
-            seconds = 0;
-            wrongMoves = 0;
+            score = 0; seconds = 0; wrongMoves = 0;
             gameActive = true;
             lastPairTime = Date.now();
+            selectedCell = null;
             
             scoreElement.innerText = "0";
             timerElement.innerText = "0";
             wrongElement.innerText = "0";
             messageElement.innerText = '';
-            selectedCell = null;
             
-            const savedHighscore = localStorage.getItem('highscore_' + currentSize) || 0;
-            const savedBestTime = localStorage.getItem('besttime_' + currentSize) || "--";
-            highscoreElement.innerText = savedHighscore;
-            besttimeElement.innerText = savedBestTime;
+            highscoreElement.innerText = localStorage.getItem('highscore_' + currentSize) || 0;
+            besttimeElement.innerText = localStorage.getItem('besttime_' + currentSize) || "--";
 
-            const totalCells = currentSize * currentSize;
-            for (let i = 0; i < totalCells; i++) {
+            for (let i = 0; i < currentSize * currentSize; i++) {
                 const val = Math.floor(Math.random() * 9) + 1;
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
@@ -315,7 +310,7 @@
 
         function handleCellClick(cell) {
             if (!gameActive || cell.classList.contains('hidden') || cell.classList.contains('error')) return;
-            initAudio();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 
             if (selectedCell === cell) {
                 cell.classList.remove('selected');
@@ -331,57 +326,62 @@
                 const val2 = parseInt(cell.innerText);
 
                 if (val1 + val2 === 10) {
-                    // GOED
-                    calculateScore(true);
+                    const now = Date.now();
+                    const points = Math.max(10, Math.floor(100 - ((now - lastPairTime)/1000 * 5)));
+                    score += points;
+                    lastPairTime = now;
+                    scoreElement.innerText = score;
+
                     selectedCell.classList.add('hidden');
                     cell.classList.add('hidden');
                     selectedCell.classList.remove('selected');
                     selectedCell = null;
                     checkGameOver();
                 } else {
-                    // FOUT
-                    const c1 = selectedCell;
-                    const c2 = cell;
-                    c1.classList.add('error');
-                    c2.classList.add('error');
+                    const c1 = selectedCell, c2 = cell;
+                    c1.classList.add('error'); c2.classList.add('error');
                     c1.classList.remove('selected');
-                    
                     wrongMoves++;
                     wrongElement.innerText = wrongMoves;
-                    
+                    score = Math.max(0, score - 20);
+                    scoreElement.innerText = score;
                     playErrorSound();
-                    calculateScore(false);
                     selectedCell = null;
-                    setTimeout(() => {
-                        c1.classList.remove('error');
-                        c2.classList.remove('error');
-                    }, 400);
+                    setTimeout(() => { c1.classList.remove('error'); c2.classList.remove('error'); }, 400);
                 }
             }
-        }
-
-        function calculateScore(isCorrect) {
-            if (isCorrect) {
-                const now = Date.now();
-                const timeDiff = (now - lastPairTime) / 1000;
-                let points = Math.max(10, Math.floor(100 - (timeDiff * 5)));
-                score += points;
-                lastPairTime = now;
-            } else {
-                score = Math.max(0, score - 20);
-            }
-            scoreElement.innerText = score;
         }
 
         function checkGameOver() {
-            const activeCells = Array.from(document.querySelectorAll('.cell:not(.hidden)'));
-            let possibleMatch = false;
-            
-            for (let i = 0; i < activeCells.length; i++) {
-                for (let j = i + 1; j < activeCells.length; j++) {
-                    if (parseInt(activeCells[i].innerText) + parseInt(activeCells[j].innerText) === 10) {
-                        possibleMatch = true;
-                        break;
+            const cells = Array.from(document.querySelectorAll('.cell:not(.hidden)'));
+            let match = false;
+            for (let i = 0; i < cells.length; i++) {
+                for (let j = i + 1; j < cells.length; j++) {
+                    if (parseInt(cells[i].innerText) + parseInt(cells[j].innerText) === 10) {
+                        match = true; break;
                     }
                 }
-           
+                if (match) break;
+            }
+
+            if (!match) {
+                gameActive = false;
+                clearInterval(timerInterval);
+                const oldHigh = parseInt(localStorage.getItem('highscore_' + currentSize) || 0);
+                const oldTime = parseInt(localStorage.getItem('besttime_' + currentSize) || 9999);
+                let txt = "Goed gedaan Louie!";
+                if (score > oldHigh) {
+                    localStorage.setItem('highscore_' + currentSize, score);
+                    txt = "Nieuwe topscore voor Louie!";
+                }
+                if (seconds < oldTime && cells.length === 0) {
+                    localStorage.setItem('besttime_' + currentSize, seconds);
+                }
+                messageElement.innerText = "Klaar! Fouten: " + wrongMoves;
+                speak(txt);
+            }
+        }
+        window.speechSynthesis.getVoices();
+    </script>
+</body>
+</html>
