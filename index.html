@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Som van 10 - Louie's Edit</title>
+    <title>Som van 10 - Levels & Topscores</title>
     <style>
+        :root {
+            --grid-size: 10;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -16,25 +20,61 @@
             touch-action: manipulation;
         }
 
+        /* Startmenu / Overlay */
+        #menu-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(240, 242, 245, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            text-align: center;
+        }
+
+        .menu-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 80%;
+            max-width: 300px;
+        }
+
         #ui-container {
             background: white;
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             display: flex;
-            gap: 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            flex-direction: column;
+            gap: 10px;
             width: 100%;
             max-width: 400px;
-            justify-content: space-around;
             box-sizing: border-box;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .highscore-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 5px;
         }
 
         #grid {
             display: grid;
-            grid-template-columns: repeat(10, 1fr); 
+            /* Dynamisch aantal kolommen via JS */
+            grid-template-columns: repeat(var(--grid-size), 1fr); 
             gap: 4px;
             background-color: #bdc3c7;
             padding: 8px;
@@ -50,7 +90,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: min(4.5vw, 20px);
+            font-size: calc(30vw / var(--grid-size)); /* Tekst past zich aan raster aan */
             font-weight: bold;
             cursor: pointer;
             border-radius: 4px;
@@ -59,45 +99,22 @@
             color: #2c3e50;
         }
 
-        .cell.selected {
-            background-color: #3498db;
-            color: white;
-            transform: scale(1.05);
-            z-index: 2;
-        }
+        @media (min-width: 500px) { .cell { font-size: 20px; } }
 
-        /* Foutmelding stijl */
-        .cell.error {
-            background-color: #e74c3c !important;
-            color: white !important;
-            animation: shake 0.3s;
-        }
+        .cell.selected { background-color: #3498db; color: white; transform: scale(1.05); }
+        .cell.error { background-color: #e74c3c !important; color: white !important; animation: shake 0.3s; }
 
         @keyframes shake {
-            0% { transform: translateX(0); }
+            0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
-            50% { transform: translateX(4px); }
-            75% { transform: translateX(-4px); }
-            100% { transform: translateX(0); }
+            75% { transform: translateX(4px); }
         }
 
-        .cell.hidden {
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        #message {
-            margin-top: 15px;
-            font-size: 1.2rem;
-            color: #2c3e50;
-            height: 30px;
-            text-align: center;
-            font-weight: bold;
-        }
+        .cell.hidden { visibility: hidden; pointer-events: none; }
 
         button {
-            margin-top: 10px;
-            padding: 12px 25px;
+            margin: 10px 0;
+            padding: 12px;
             font-size: 1rem;
             cursor: pointer;
             background-color: #27ae60;
@@ -105,65 +122,101 @@
             border: none;
             border-radius: 8px;
             width: 100%;
-            max-width: 200px;
+            font-weight: bold;
         }
 
-        @media (max-width: 350px) {
-            #ui-container { font-size: 1rem; }
-            #grid { gap: 2px; padding: 4px; }
+        button.btn-easy { background-color: #27ae60; }
+        button.btn-medium { background-color: #f39c12; }
+        button.btn-hard { background-color: #e74c3c; }
+
+        #message {
+            margin-top: 10px;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            font-weight: bold;
+            text-align: center;
+            min-height: 1.5rem;
         }
     </style>
 </head>
 <body>
 
+    <div id="menu-overlay">
+        <div class="menu-content">
+            <h2>Som van 10</h2>
+            <p>Kies een niveau:</p>
+            <button class="btn-easy" onclick="startGame(6)">Makkelijk (6x6)</button>
+            <button class="btn-medium" onclick="startGame(8)">Gemiddeld (8x8)</button>
+            <button class="btn-hard" onclick="startGame(10)">Moeilijk (10x10)</button>
+        </div>
+    </div>
+
     <div id="ui-container">
-        <div class="stat">Score: <span id="score">0</span></div>
-        <div class="stat">Tijd: <span id="timer">0</span>s</div>
+        <div class="stats-row">
+            <div>Score: <span id="score">0</span></div>
+            <div>Tijd: <span id="timer">0</span>s</div>
+        </div>
+        <div class="highscore-label">Persoonlijk record (dit level): <span id="highscore">0</span></div>
     </div>
 
     <div id="grid"></div>
 
     <div id="message"></div>
-    <button onclick="resetGame()">Nieuw Spel</button>
+    <button onclick="showMenu()" style="background-color: #95a5a6; max-width: 200px;">Menu</button>
 
     <script>
         const gridElement = document.getElementById('grid');
         const scoreElement = document.getElementById('score');
         const timerElement = document.getElementById('timer');
+        const highscoreElement = document.getElementById('highscore');
         const messageElement = document.getElementById('message');
+        const menuOverlay = document.getElementById('menu-overlay');
         
         let score = 0;
         let seconds = 0;
         let timerInterval;
         let selectedCell = null;
         let lastPairTime = 0;
-        let gameActive = true;
+        let gameActive = false;
+        let currentSize = 10;
 
-        // Audio Context voor een 'beep' geluid zonder extern bestand
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         function playErrorSound() {
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.type = 'sawtooth';
-            oscillator.frequency.setValueAtTime(150, audioCtx.currentTime); // Lage toon
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            oscillator.stop(audioCtx.currentTime + 0.3);
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.stop(audioCtx.currentTime + 0.2);
         }
 
         function speak(text) {
             const msg = new SpeechSynthesisUtterance();
             msg.text = text;
-            // Zoek naar een Vlaamse/Nederlandse stem
             const voices = window.speechSynthesis.getVoices();
-            const flemishVoice = voices.find(v => v.lang === 'nl-BE') || voices.find(v => v.lang === 'nl-NL');
-            if (flemishVoice) msg.voice = flemishVoice;
+            const voice = voices.find(v => v.lang === 'nl-BE') || voices.find(v => v.lang === 'nl-NL');
+            if (voice) msg.voice = voice;
             msg.lang = 'nl-BE';
             window.speechSynthesis.speak(msg);
+        }
+
+        function showMenu() {
+            menuOverlay.style.display = 'flex';
+            clearInterval(timerInterval);
+            gameActive = false;
+        }
+
+        function startGame(size) {
+            currentSize = size;
+            document.documentElement.style.setProperty('--grid-size', size);
+            menuOverlay.style.display = 'none';
+            initGame();
         }
 
         function initGame() {
@@ -176,7 +229,12 @@
             timerElement.innerText = seconds;
             messageElement.innerText = '';
             
-            for (let i = 0; i < 100; i++) {
+            // Laad topscore voor dit specifieke level
+            const savedHighscore = localStorage.getItem('highscore_' + currentSize) || 0;
+            highscoreElement.innerText = savedHighscore;
+
+            const totalCells = currentSize * currentSize;
+            for (let i = 0; i < totalCells; i++) {
                 const val = Math.floor(Math.random() * 9) + 1;
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
@@ -195,97 +253,8 @@
         function handleCellClick(cell) {
             if (!gameActive || cell.classList.contains('hidden') || cell.classList.contains('error')) return;
 
-            // Browser audio ontgrendelen (nodig voor sommige mobiele browsers)
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
             if (selectedCell === cell) {
                 cell.classList.remove('selected');
                 selectedCell = null;
                 return;
-            }
-
-            if (!selectedCell) {
-                selectedCell = cell;
-                cell.classList.add('selected');
-            } else {
-                const val1 = parseInt(selectedCell.innerText);
-                const val2 = parseInt(cell.innerText);
-
-                if (val1 + val2 === 10) {
-                    // GOED
-                    calculateScore(true);
-                    selectedCell.classList.add('hidden');
-                    cell.classList.add('hidden');
-                    selectedCell.classList.remove('selected');
-                    selectedCell = null;
-                    checkGameOver();
-                } else {
-                    // FOUT
-                    const firstCell = selectedCell;
-                    const secondCell = cell;
-                    
-                    firstCell.classList.add('error');
-                    secondCell.classList.add('error');
-                    firstCell.classList.remove('selected');
-                    
-                    playErrorSound();
-                    calculateScore(false);
-
-                    selectedCell = null;
-
-                    setTimeout(() => {
-                        firstCell.classList.remove('error');
-                        secondCell.classList.remove('error');
-                    }, 500);
-                }
-            }
-        }
-
-        function calculateScore(isCorrect) {
-            if (isCorrect) {
-                const now = Date.now();
-                const timeDiff = (now - lastPairTime) / 1000;
-                let points = Math.max(10, Math.floor(100 - (timeDiff * 5)));
-                score += points;
-                lastPairTime = now;
-            } else {
-                // Strafpunten: -20 bij een fout
-                score = Math.max(0, score - 20);
-            }
-            scoreElement.innerText = score;
-        }
-
-        function checkGameOver() {
-            const activeCells = Array.from(document.querySelectorAll('.cell:not(.hidden)'));
-            let possibleMatch = false;
-            
-            for (let i = 0; i < activeCells.length; i++) {
-                for (let j = i + 1; j < activeCells.length; j++) {
-                    if (parseInt(activeCells[i].innerText) + parseInt(activeCells[j].innerText) === 10) {
-                        possibleMatch = true;
-                        break;
-                    }
-                }
-                if (possibleMatch) break;
-            }
-
-            if (!possibleMatch) {
-                gameActive = false;
-                clearInterval(timerInterval);
-                const finalMsg = "Game over. Goed gedaan Louie!";
-                messageElement.innerText = finalMsg;
-                speak(finalMsg);
-            }
-        }
-
-        function resetGame() {
-            initGame();
-        }
-
-        // Stemmen laden kan even duren in sommige browsers
-        window.speechSynthesis.onvoiceschanged = () => {};
-
-        initGame();
-    </script>
-</body>
-</html>
+  
