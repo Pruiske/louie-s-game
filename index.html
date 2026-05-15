@@ -2,386 +2,358 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- Apple Web App instellingen -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Som van 10">
-    
-    <title>Som van 10 - Louie's Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Som van 10 - Game Hub</title>
     <style>
-        :root { --grid-size: 10; }
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+            --text: #2c3e50;
+        }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f0f2f5;
             margin: 0;
-            padding: env(safe-area-inset-top) 10px 20px 10px;
-            touch-action: manipulation;
-            overflow-x: hidden;
-            -webkit-user-select: none;
-            user-select: none;
+            padding: 20px;
         }
 
-        /* STARTMENU */
-        #menu-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #f0f2f5;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
+        /* Schermen */
+        .screen { display: none; flex-direction: column; align-items: center; width: 100%; }
+        .active { display: flex; }
 
-        .menu-box {
+        /* Header UI */
+        #game-header {
             background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            width: 85%;
-            max-width: 350px;
-            text-align: center;
-        }
-
-        #ui-container {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 15px 30px;
+            border-radius: 15px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            margin-bottom: 10px;
-            width: 100%;
-            max-width: 500px;
-            box-sizing: border-box;
-            display: none;
-        }
-
-        .stats-main {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        .stat-box { display: flex; flex-direction: column; align-items: center; font-weight: bold; }
-        .stat-value { font-size: 1.2rem; color: #2c3e50; }
-        .stat-label { font-size: 0.7rem; color: #7f8c8d; text-transform: uppercase; }
-        .wrong-stat { color: #e74c3c; border-left: 1px solid #eee; border-right: 1px solid #eee; }
-
-        .records-row {
             display: flex;
-            justify-content: space-around;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-            font-size: 0.8rem;
-            color: #95a5a6;
+            gap: 30px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
         }
 
+        /* Menu */
+        .menu-container { text-align: center; }
+        .menu-btn {
+            display: block;
+            width: 300px;
+            padding: 15px;
+            margin: 10px;
+            font-size: 1.1rem;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .menu-btn:hover { background: var(--primary); color: white; }
+
+        /* Grid Layout */
         #grid {
             display: grid;
-            grid-template-columns: repeat(var(--grid-size), 1fr); 
-            gap: 4px;
-            background-color: #bdc3c7;
-            padding: 8px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 500px; 
-            box-sizing: border-box;
-            display: none;
+            grid-template-columns: repeat(10, 45px);
+            grid-template-rows: repeat(10, 45px);
+            gap: 5px;
+            background: #bdc3c7;
+            padding: 10px;
+            border-radius: 10px;
         }
 
         .cell {
-            aspect-ratio: 1 / 1; 
-            background-color: white;
+            width: 45px;
+            height: 45px;
+            background: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: calc(45vw / var(--grid-size));
+            font-size: 1.2rem;
             font-weight: bold;
+            border-radius: 5px;
             cursor: pointer;
-            border-radius: 4px;
-            color: #2c3e50;
-            transition: background-color 0.1s;
+            user-select: none;
+            transition: all 0.2s;
         }
-
-        @media (min-width: 500px) { .cell { font-size: 24px; } }
-
-        .cell.selected { background-color: #3498db; color: white; }
-        .cell.error { background-color: #e74c3c !important; color: white !important; animation: shake 0.3s; }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
-        }
-
+        .cell.selected { background: var(--primary); color: white; transform: scale(1.1); }
+        .cell.cpu-selected { background: #f1c40f; color: black; border: 2px solid orange; }
         .cell.hidden { visibility: hidden; pointer-events: none; }
 
-        .level-btn {
-            margin: 10px 0;
-            padding: 18px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            width: 100%;
-            font-weight: bold;
-            -webkit-appearance: none;
-        }
-        .btn-easy { background-color: #27ae60; }
-        .btn-medium { background-color: #f39c12; }
-        .btn-hard { background-color: #e74c3c; }
+        /* Spel 3: Toetsenbord */
+        #kb-game { font-size: 3rem; margin: 40px; }
+        #kb-input { border: 3px solid var(--primary); border-radius: 10px; padding: 10px; width: 60px; text-align: center; }
 
-        #message {
-            margin: 10px 0;
-            font-size: 1.1rem;
-            color: #2c3e50;
-            font-weight: bold;
-            text-align: center;
-            min-height: 1.5rem;
-        }
-
-        .menu-nav-btn {
-            display: none;
-            margin-top: 10px;
-            padding: 12px 25px;
-            background: #95a5a6;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-        }
+        .btn-back { margin-top: 20px; background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="menu-overlay">
-        <div class="menu-box">
-            <h1 style="margin:0 0 10px 0; color:#2c3e50;">Som van 10</h1>
-            <p>Welkom Louie!</p>
-            <button class="level-btn btn-easy" onclick="clickStart(6)">Makkelijk (6x6)</button>
-            <button class="level-btn btn-medium" onclick="clickStart(8)">Gemiddeld (8x8)</button>
-            <button class="level-btn btn-hard" onclick="clickStart(10)">Moeilijk (10x10)</button>
+    <!-- HOOFDMENU -->
+    <div id="menu-screen" class="screen active">
+        <h1>Som van 10</h1>
+        <p>Kies een speltype:</p>
+        <div class="menu-container">
+            <button class="menu-btn" onclick="startGame(1)">1. Klassiek Raster</button>
+            <button class="menu-btn" onclick="startGame(2)">2. Computer Kiest</button>
+            <button class="menu-btn" onclick="startGame(3)">3. Toetsenbord Race</button>
+            <button class="menu-btn" onclick="startGame(4)">4. Gravity Mode</button>
         </div>
     </div>
 
-    <div id="ui-container">
-        <div class="stats-main">
-            <div class="stat-box">
-                <span class="stat-label">Punten</span>
-                <span id="score" class="stat-value">0</span>
-            </div>
-            <div class="stat-box wrong-stat">
-                <span class="stat-label">Fouten</span>
-                <span id="wrong-count" class="stat-value">0</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">Tijd</span>
-                <span id="timer" class="stat-value">0</span>
-            </div>
+    <!-- SPEL SCHERM -->
+    <div id="game-screen" class="screen">
+        <div id="game-header">
+            <div>Punten: <span id="score">0</span></div>
+            <div>Tijd: <span id="timer">0</span>s</div>
         </div>
-        <div class="records-row">
-            <div>Record: <span id="highscore">0</span></div>
-            <div>Snelst: <span id="besttime">--</span>s</div>
-        </div>
-    </div>
 
-    <div id="grid"></div>
-    <div id="message"></div>
-    <button id="back-btn" class="menu-nav-btn" onclick="showMenu()">Menu</button>
+        <!-- Container voor de verschillende spellen -->
+        <div id="grid-container">
+            <div id="grid"></div>
+        </div>
+
+        <div id="kb-game-container" style="display:none;">
+            <div id="kb-game">
+                <span id="num1">5</span> + <input type="text" id="kb-input" maxlength="1" autocomplete="off"> = 10
+            </div>
+        </div>
+
+        <div id="msg" style="margin-top:15px; font-weight:bold; color:var(--danger);"></div>
+        <button class="btn-back" onclick="goToMenu()">Stoppen en Menu</button>
+    </div>
 
     <script>
-        // GLOBALE VARIABELEN
-        let score = 0, seconds = 0, wrongMoves = 0, timerInterval, selectedCell = null, 
-            lastPairTime = 0, gameActive = false, currentSize = 10, audioCtx = null;
+        let currentGame = 0;
+        let score = 0;
+        let seconds = 0;
+        let timerInterval;
+        let lastActionTime = 0;
+        let selectedCell = null;
+        let cpuTargetIndex = null;
+        let gridData = []; // 2D array voor Gravity
 
-        // ELEMENTEN
         const gridElement = document.getElementById('grid');
-        const scoreElement = document.getElementById('score');
-        const timerElement = document.getElementById('timer');
-        const wrongElement = document.getElementById('wrong-count');
-        const highscoreElement = document.getElementById('highscore');
-        const besttimeElement = document.getElementById('besttime');
-        const messageElement = document.getElementById('message');
-        const menuOverlay = document.getElementById('menu-overlay');
-        const uiContainer = document.getElementById('ui-container');
-        const backBtn = document.getElementById('back-btn');
+        const kbContainer = document.getElementById('kb-game-container');
+        const gridUIContainer = document.getElementById('grid-container');
 
-        // iOS AUDIO UNLOCK
-        function clickStart(size) {
-            // 1. Initialiseer Audio direct op de klik
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-
-            // 2. Initialiseer Spraak (stille start voor iOS)
-            const silentMsg = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(silentMsg);
-
-            // 3. Start het spel
-            startGame(size);
-        }
-
-        function playErrorSound() {
-            if (!audioCtx) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                osc.start();
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.stop(audioCtx.currentTime + 0.2);
-            } catch(e) { console.log("Audio error"); }
-        }
-
-        function speak(text) {
-            try {
-                window.speechSynthesis.cancel(); // Stop lopende spraak
-                const msg = new SpeechSynthesisUtterance(text);
-                msg.lang = 'nl-BE';
-                const voices = window.speechSynthesis.getVoices();
-                const voice = voices.find(v => v.lang === 'nl-BE') || voices.find(v => v.lang === 'nl-NL');
-                if (voice) msg.voice = voice;
-                window.speechSynthesis.speak(msg);
-            } catch(e) { console.log("Speech error"); }
-        }
-
-        function showMenu() {
-            menuOverlay.style.display = 'flex';
-            uiContainer.style.display = 'none';
-            gridElement.style.display = 'none';
-            backBtn.style.display = 'none';
-            clearInterval(timerInterval);
-            gameActive = false;
-        }
-
-        function startGame(size) {
-            currentSize = size;
-            document.documentElement.style.setProperty('--grid-size', size);
-            menuOverlay.style.display = 'none';
-            uiContainer.style.display = 'block';
-            gridElement.style.display = 'grid';
-            backBtn.style.display = 'block';
-            initGame();
-        }
-
-        function initGame() {
-            gridElement.innerHTML = '';
-            score = 0; seconds = 0; wrongMoves = 0;
-            gameActive = true;
-            lastPairTime = Date.now();
-            selectedCell = null;
+        function startGame(type) {
+            currentGame = type;
+            score = 0;
+            seconds = 0;
+            lastActionTime = Date.now();
+            document.getElementById('score').innerText = '0';
+            document.getElementById('timer').innerText = '0';
+            document.getElementById('msg').innerText = '';
             
-            scoreElement.innerText = "0";
-            timerElement.innerText = "0";
-            wrongElement.innerText = "0";
-            messageElement.innerText = '';
+            showScreen('game-screen');
             
-            highscoreElement.innerText = localStorage.getItem('highscore_' + currentSize) || 0;
-            besttimeElement.innerText = localStorage.getItem('besttime_' + currentSize) || "--";
-
-            for (let i = 0; i < currentSize * currentSize; i++) {
-                const val = Math.floor(Math.random() * 9) + 1;
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.innerText = val;
-                cell.addEventListener('click', () => handleCellClick(cell));
-                gridElement.appendChild(cell);
+            if (type === 3) {
+                gridUIContainer.style.display = 'none';
+                kbContainer.style.display = 'block';
+                setupKeyboardGame();
+            } else {
+                gridUIContainer.style.display = 'block';
+                kbContainer.style.display = 'none';
+                initGrid();
             }
 
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 seconds++;
-                timerElement.innerText = seconds;
+                document.getElementById('timer').innerText = seconds;
             }, 1000);
         }
 
-        function handleCellClick(cell) {
-            if (!gameActive || cell.classList.contains('hidden') || cell.classList.contains('error')) return;
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        function initGrid() {
+            gridElement.innerHTML = '';
+            gridData = [];
+            
+            // Maak 10x10 data model
+            for (let r = 0; r < 10; r++) {
+                gridData[r] = [];
+                for (let c = 0; c < 10; c++) {
+                    gridData[r][c] = Math.floor(Math.random() * 9) + 1;
+                }
+            }
+            renderGrid();
+            if (currentGame === 2) cpuPick();
+        }
 
-            if (selectedCell === cell) {
-                cell.classList.remove('selected');
-                selectedCell = null;
+        function renderGrid() {
+            gridElement.innerHTML = '';
+            for (let r = 0; r < 10; r++) {
+                for (let c = 0; c < 10; c++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    if (gridData[r][c] === 0) {
+                        cell.classList.add('hidden');
+                    } else {
+                        cell.innerText = gridData[r][c];
+                        cell.dataset.r = r;
+                        cell.dataset.c = c;
+                        cell.onclick = () => handleCellClick(r, c, cell);
+                    }
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+
+        function handleCellClick(r, c, cell) {
+            const val = gridData[r][c];
+
+            if (currentGame === 2) {
+                // Modus 2: Speler moet partner van CPU kiezen
+                const targetVal = gridData[Math.floor(cpuTargetIndex/10)][cpuTargetIndex%10];
+                if (val + targetVal === 10) {
+                    addScore();
+                    gridData[r][c] = 0;
+                    gridData[Math.floor(cpuTargetIndex/10)][cpuTargetIndex%10] = 0;
+                    renderGrid();
+                    if (!checkGameOver()) cpuPick();
+                }
                 return;
             }
 
+            // Modus 1 & 4: Zelf paren kiezen
             if (!selectedCell) {
-                selectedCell = cell;
+                selectedCell = { r, c, cell };
                 cell.classList.add('selected');
             } else {
-                const val1 = parseInt(selectedCell.innerText);
-                const val2 = parseInt(cell.innerText);
+                const val1 = gridData[selectedCell.r][selectedCell.c];
+                const val2 = gridData[r][c];
 
-                if (val1 + val2 === 10) {
-                    const now = Date.now();
-                    const points = Math.max(10, Math.floor(100 - ((now - lastPairTime)/1000 * 5)));
-                    score += points;
-                    lastPairTime = now;
-                    scoreElement.innerText = score;
-
-                    selectedCell.classList.add('hidden');
-                    cell.classList.add('hidden');
-                    selectedCell.classList.remove('selected');
+                if (val1 + val2 === 10 && (selectedCell.r !== r || selectedCell.c !== c)) {
+                    addScore();
+                    gridData[selectedCell.r][selectedCell.c] = 0;
+                    gridData[r][c] = 0;
+                    
+                    if (currentGame === 4) applyGravity();
+                    
                     selectedCell = null;
+                    renderGrid();
                     checkGameOver();
                 } else {
-                    const c1 = selectedCell, c2 = cell;
-                    c1.classList.add('error'); c2.classList.add('error');
-                    c1.classList.remove('selected');
-                    wrongMoves++;
-                    wrongElement.innerText = wrongMoves;
-                    score = Math.max(0, score - 20);
-                    scoreElement.innerText = score;
-                    playErrorSound();
+                    document.querySelectorAll('.cell').forEach(el => el.classList.remove('selected'));
                     selectedCell = null;
-                    setTimeout(() => { c1.classList.remove('error'); c2.classList.remove('error'); }, 400);
                 }
             }
+        }
+
+        function cpuPick() {
+            // Zoek alle mogelijke paren
+            let pairs = [];
+            for(let r=0; r<10; r++){
+                for(let c=0; c<10; c++){
+                    if(gridData[r][c] === 0) continue;
+                    for(let r2=0; r2<10; r2++){
+                        for(let c2=0; c2<10; c2++){
+                            if(r===r2 && c===c2) continue;
+                            if(gridData[r2][c2] !== 0 && gridData[r][c] + gridData[r2][c2] === 10) {
+                                pairs.push(r * 10 + c);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(pairs.length > 0) {
+                cpuTargetIndex = pairs[Math.floor(Math.random() * pairs.length)];
+                setTimeout(() => {
+                    const cells = document.querySelectorAll('.cell');
+                    cells.forEach(cell => {
+                        if(cell.dataset.r == Math.floor(cpuTargetIndex/10) && cell.dataset.c == cpuTargetIndex%10) {
+                            cell.classList.add('cpu-selected');
+                        }
+                    });
+                }, 100);
+            }
+        }
+
+        function applyGravity() {
+            for (let c = 0; c < 10; c++) {
+                let emptyRow = 9;
+                for (let r = 9; r >= 0; r--) {
+                    if (gridData[r][c] !== 0) {
+                        let temp = gridData[r][c];
+                        gridData[r][c] = 0;
+                        gridData[emptyRow][c] = temp;
+                        emptyRow--;
+                    }
+                }
+            }
+        }
+
+        // SPEL 3 LOGICA
+        function setupKeyboardGame() {
+            const input = document.getElementById('kb-input');
+            const num1El = document.getElementById('num1');
+            let n1 = Math.floor(Math.random() * 9) + 1;
+            num1El.innerText = n1;
+            input.value = '';
+            input.focus();
+
+            input.oninput = () => {
+                let val = parseInt(input.value);
+                if (val + n1 === 10) {
+                    addScore();
+                    n1 = Math.floor(Math.random() * 9) + 1;
+                    num1El.innerText = n1;
+                    input.value = '';
+                } else if (input.value.length > 0) {
+                    input.value = ''; // Foutief? Reset veld
+                }
+            };
+        }
+
+        function addScore() {
+            const now = Date.now();
+            const diff = (now - lastActionTime) / 1000;
+            const points = Math.max(10, Math.floor(100 - (diff * 7)));
+            score += points;
+            document.getElementById('score').innerText = score;
+            lastActionTime = now;
         }
 
         function checkGameOver() {
-            const cells = Array.from(document.querySelectorAll('.cell:not(.hidden)'));
-            let match = false;
-            for (let i = 0; i < cells.length; i++) {
-                for (let j = i + 1; j < cells.length; j++) {
-                    if (parseInt(cells[i].innerText) + parseInt(cells[j].innerText) === 10) {
-                        match = true; break;
+            let possible = false;
+            let count = 0;
+            for(let r=0; r<10; r++) {
+                for(let c=0; c<10; c++) {
+                    if(gridData[r][c] === 0) continue;
+                    count++;
+                    for(let r2=0; r2<10; r2++) {
+                        for(let c2=0; c2<10; c2++) {
+                            if(r===r2 && c===c2) continue;
+                            if(gridData[r2][c2] !== 0 && gridData[r][c] + gridData[r2][c2] === 10) possible = true;
+                        }
                     }
                 }
-                if (match) break;
             }
 
-            if (!match) {
-                gameActive = false;
+            if (!possible) {
                 clearInterval(timerInterval);
-                const oldHigh = parseInt(localStorage.getItem('highscore_' + currentSize) || 0);
-                const oldTime = parseInt(localStorage.getItem('besttime_' + currentSize) || 9999);
-                let txt = "Goed gedaan Louie!";
-                if (score > oldHigh) {
-                    localStorage.setItem('highscore_' + currentSize, score);
-                    txt = "Nieuwe topscore voor Louie!";
-                }
-                if (seconds < oldTime && cells.length === 0) {
-                    localStorage.setItem('besttime_' + currentSize, seconds);
-                }
-                messageElement.innerText = "Klaar! Fouten: " + wrongMoves;
-                speak(txt);
+                document.getElementById('msg').innerText = count === 0 ? "GEWONNEN! Veld is leeg." : "GAME OVER! Geen zetten meer.";
+                return true;
             }
+            return false;
         }
-        window.speechSynthesis.getVoices();
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function goToMenu() {
+            clearInterval(timerInterval);
+            showScreen('menu-screen');
+        }
     </script>
 </body>
 </html>
