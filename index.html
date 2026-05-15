@@ -3,72 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Som van 10 - Pro Edition</title>
+    <title>Som van 10 - Versie 2.2</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
         :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --accent: #f1c40f;
-            --danger: #e74c3c;
-            --bg: #ecf0f1;
-            --text: #2c3e50;
+            --primary: #6c5ce7;
+            --secondary: #00cec9;
+            --accent: #fab1a0;
+            --danger: #ff7675;
+            --bg-gradient: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Fredoka', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: #2d3436;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
+        /* Titels & Versie */
+        .header-container {
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { margin: 0; font-size: 2.5rem; color: var(--primary); }
+        .version { font-size: 1rem; color: #636e72; font-weight: 600; margin-top: -5px; }
+
+        /* Schermen */
         .screen { display: none; width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; }
-        .active { display: flex; }
+        .active { display: flex; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Stats Bar */
         #stats-bar {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            background: white;
+            gap: 12px;
+            background: var(--card-bg);
             padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             width: 100%;
-            margin-bottom: 15px;
-            font-weight: bold;
+            margin-bottom: 20px;
+            border: 2px solid white;
         }
-        .stat-item { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 2px 5px; font-size: 0.9rem; }
+        .stat-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 600; }
+        .stat-icon { font-size: 1.2rem; }
 
-        /* Knoppen */
+        /* Knoppen Menu */
         .btn {
             width: 100%;
-            padding: 15px;
-            margin: 8px 0;
-            border: 2px solid var(--primary);
-            border-radius: 10px;
+            padding: 18px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 15px;
             background: white;
             color: var(--primary);
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px solid transparent;
         }
-        .btn:hover { background: var(--primary); color: white; }
-        .btn-back { background: #95a5a6; color: white; border: none; margin-top: 20px; }
+        .btn:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: var(--primary); }
+        .btn-back { background: #dfe6e9; color: #636e72; margin-top: 20px; width: auto; min-width: 150px; }
 
-        /* Grid */
+        /* Spel Raster */
         #grid-container {
             position: relative;
-            background: #bdc3c7;
-            border: 4px solid #bdc3c7;
-            border-radius: 8px;
-            margin: 0 auto;
-            /* De grootte wordt via JS gezet */
+            background: rgba(0,0,0,0.05);
+            border-radius: 15px;
+            border: 8px solid rgba(255,255,255,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
         .cell {
@@ -77,61 +98,83 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: clamp(1rem, 4vw, 1.4rem);
-            font-weight: bold;
-            border-radius: 4px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-radius: 10px;
             cursor: pointer;
             user-select: none;
-            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.3s, background 0.2s, transform 0.2s;
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), left 0.3s, background 0.3s, transform 0.2s;
             box-sizing: border-box;
-            border: 1px solid #ddd;
-            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
+            color: var(--primary);
+            box-shadow: 0 4px 0 #dfe6e9;
         }
 
-        .cell.selected { background: var(--primary); color: white; transform: scale(0.9); z-index: 10; }
-        .cell.cpu-hint { background: var(--accent); border: 3px solid orange; animation: pulse 1s infinite; }
-        .cell.exploding { transform: scale(0) rotate(90deg); opacity: 0; }
+        .cell:hover { background: #f9f9f9; transform: scale(1.02); }
+        .cell.selected { background: var(--primary); color: white; transform: scale(0.9); box-shadow: 0 0 15px var(--primary); }
+        .cell.cpu-hint { background: var(--accent); color: white; border: 3px solid #e17055; animation: bounce 1s infinite; }
+        .cell.exploding { transform: scale(0) rotate(180deg); opacity: 0; }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* Keyboard area */
+        #kb-area { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            font-size: 2.5rem; 
+            text-align: center;
+        }
+        #kb-input { 
+            width: 80px; 
+            padding: 5px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem; 
+            border: 4px solid var(--secondary); 
+            border-radius: 15px; 
+            text-align: center; 
+            color: var(--primary);
+            outline: none;
         }
 
-        /* Keyboard game */
-        #kb-area { font-size: 2.5rem; text-align: center; margin: 40px 0; }
-        #kb-input { width: 70px; font-size: 2.5rem; border: 3px solid var(--primary); border-radius: 10px; text-align: center; outline: none; }
+        #msg { height: 40px; margin-top: 15px; font-size: 1.2rem; font-weight: 600; color: #d63031; text-align: center; }
 
-        #msg { height: 30px; margin-top: 10px; font-weight: bold; color: var(--danger); text-align: center; }
+        /* Decoratie afbeelding/icoon */
+        .game-icon-top { font-size: 3rem; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
+    <div class="header-container">
+        <h1>🔢 Som van 10</h1>
+        <div class="version">Versie 2.2</div>
+    </div>
+
     <!-- MENU -->
     <div id="menu-screen" class="screen active">
-        <h1>🔢 Som van 10</h1>
-        <button class="btn" onclick="showLevelSelect(1)">1. Klassiek Raster</button>
-        <button class="btn" onclick="showLevelSelect(2)">2. Computer Kiest</button>
-        <button class="btn" onclick="openKeyboardGame()">3. Toetsenbord Race</button>
-        <button class="btn" onclick="showLevelSelect(4)">4. Gravity Mode</button>
+        <div class="game-icon-top">🎨</div>
+        <button class="btn" onclick="showLevelSelect(1)"><span>🧩</span> Klassiek Raster</button>
+        <button class="btn" onclick="showLevelSelect(2)"><span>🤖</span> Computer Kiest</button>
+        <button class="btn" onclick="openKeyboardGame()"><span>⌨️</span> Toetsenbord Race</button>
+        <button class="btn" onclick="showLevelSelect(4)"><span>🪐</span> Gravity Mode</button>
     </div>
 
     <!-- LEVEL SELECTIE -->
     <div id="level-screen" class="screen">
-        <h1 id="level-title">Kies Niveau</h1>
-        <button class="btn" onclick="startGridGame(6)">Makkelijk (6x6)</button>
-        <button class="btn" onclick="startGridGame(8)">Gemiddeld (8x8)</button>
-        <button class="btn" onclick="startGridGame(10)">Moeilijk (10x10)</button>
+        <h2 id="level-title">Kies Niveau</h2>
+        <button class="btn" onclick="startGridGame(6)">🟢 Makkelijk (6x6)</button>
+        <button class="btn" onclick="startGridGame(8)">🟡 Gemiddeld (8x8)</button>
+        <button class="btn" onclick="startGridGame(10)">🔴 Moeilijk (10x10)</button>
         <button class="btn btn-back" onclick="showScreen('menu-screen')">Terug</button>
     </div>
 
     <!-- GAME SCHERM -->
     <div id="game-screen" class="screen">
         <div id="stats-bar">
-            <div class="stat-item"><span>Score:</span> <span id="stat-score">0</span></div>
-            <div class="stat-item"><span>Tijd:</span> <span id="stat-timer">0</span>s</div>
-            <div class="stat-item"><span>Fouten:</span> <span id="stat-errors">0</span></div>
-            <div class="stat-item"><span>Record:</span> <span id="stat-high">0</span></div>
+            <div class="stat-item"><span class="stat-icon">⭐</span> <span id="stat-score">0</span></div>
+            <div class="stat-item"><span class="stat-icon">⏱️</span> <span id="stat-timer">0</span>s</div>
+            <div class="stat-item"><span class="stat-icon">❌</span> <span id="stat-errors">0</span></div>
+            <div class="stat-item"><span class="stat-icon">🏆</span> <span id="stat-high">0</span></div>
         </div>
 
         <div id="grid-container"></div>
@@ -141,7 +184,7 @@
         </div>
 
         <div id="msg"></div>
-        <button class="btn btn-back" onclick="exitGame()">Stoppen</button>
+        <button class="btn btn-back" onclick="exitGame()">🏠 Menu</button>
     </div>
 
     <script>
@@ -157,7 +200,7 @@
 
         function showLevelSelect(type) {
             config.type = type;
-            const titels = ["", "Klassiek", "Computer Kiest", "", "Gravity Mode"];
+            const titels = ["", "🧩 Klassiek", "🤖 Computer Kiest", "", "🪐 Gravity Mode"];
             document.getElementById('level-title').innerText = titels[type];
             showScreen('level-screen');
         }
@@ -179,9 +222,8 @@
             document.getElementById('grid-container').style.display = 'block';
             document.getElementById('kb-area').style.display = 'none';
             
-            // Bereken celgrootte op basis van schermbreedte
-            const availableWidth = Math.min(window.innerWidth - 40, 460);
-            config.cellSize = Math.floor(availableWidth / config.size);
+            const containerWidth = Math.min(window.innerWidth - 40, 460);
+            config.cellSize = Math.floor(containerWidth / config.size);
             
             initGrid();
             startTimer();
@@ -206,8 +248,8 @@
                     const el = document.createElement('div');
                     el.className = 'cell';
                     el.innerText = val;
-                    el.style.width = config.cellSize + 'px';
-                    el.style.height = config.cellSize + 'px';
+                    el.style.width = (config.cellSize - 4) + 'px';
+                    el.style.height = (config.cellSize - 4) + 'px';
                     
                     const cellObj = { r, c, val, el };
                     updateCellPosition(cellObj);
@@ -217,12 +259,12 @@
                     grid.push(cellObj);
                 }
             }
-            if (config.type === 2) setTimeout(cpuPick, 500);
+            if (config.type === 2) setTimeout(cpuPick, 800);
         }
 
         function updateCellPosition(cell) {
-            cell.el.style.top = (cell.r * config.cellSize) + 'px';
-            cell.el.style.left = (cell.c * config.cellSize) + 'px';
+            cell.el.style.top = (cell.r * config.cellSize + 2) + 'px';
+            cell.el.style.left = (cell.c * config.cellSize + 2) + 'px';
         }
 
         function handleCellClick(clicked) {
@@ -230,7 +272,7 @@
                 if (state.cpuTarget && (clicked.val + state.cpuTarget.val === 10) && clicked !== state.cpuTarget) {
                     removePair(clicked, state.cpuTarget);
                     state.cpuTarget = null;
-                    if(!checkGameOver()) setTimeout(cpuPick, 600);
+                    if(!checkGameOver()) setTimeout(cpuPick, 700);
                 } else {
                     registerError();
                 }
@@ -320,14 +362,18 @@
         }
 
         function addScore() {
-            const points = Math.max(10, Math.floor(100 - ((Date.now() - state.lastTime) / 100)));
+            const now = Date.now();
+            const diff = (now - state.lastTime) / 1000;
+            const points = Math.max(10, Math.floor(100 - (diff * 8)));
             state.score += points;
-            state.lastTime = Date.now();
+            state.lastTime = now;
             updateStatsUI();
         }
 
         function registerError() {
             state.errors++;
+            document.getElementById('msg').innerText = "Oeps! Probeer opnieuw ❌";
+            setTimeout(() => document.getElementById('msg').innerText = "", 1000);
             updateStatsUI();
         }
 
@@ -336,10 +382,13 @@
             document.getElementById('stat-errors').innerText = state.errors;
             document.getElementById('stat-timer').innerText = state.seconds;
             
-            const key = `rec_${config.type}_${config.size}`;
-            const high = localStorage.getItem(key) || 0;
+            const key = `rec_v22_${config.type}_${config.size}`;
+            let high = localStorage.getItem(key) || 0;
+            if (state.score > high) {
+                high = state.score;
+                localStorage.setItem(key, high);
+            }
             document.getElementById('stat-high').innerText = high;
-            if (state.score > high) localStorage.setItem(key, state.score);
         }
 
         function startTimer() {
@@ -353,7 +402,8 @@
         function checkGameOver() {
             if (findPossiblePairs().length === 0) {
                 clearInterval(timerInterval);
-                document.getElementById('msg').innerText = grid.length === 0 ? "GEWONNEN! 🎉" : "GEEN ZETTEN MEER! ⛔";
+                const isWin = grid.length === 0;
+                document.getElementById('msg').innerHTML = isWin ? "🎉 GEWONNEN! SUPER! 🎉" : "⛔ GEEN ZETTEN MEER! ⛔";
                 return true;
             }
             return false;
