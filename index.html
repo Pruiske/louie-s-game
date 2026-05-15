@@ -30,15 +30,15 @@
             touch-action: manipulation;
         }
 
-        .header-container { text-align: center; margin: 10px 0; }
-        h1 { margin: 0; font-size: 2rem; color: var(--primary); }
+        .header-container { text-align: center; margin: 15px 0; }
+        h1 { margin: 0; font-size: 2.2rem; color: var(--primary); text-shadow: 2px 2px 0px white; }
         .version { font-size: 0.9rem; color: #636e72; font-weight: 600; margin-top: -5px; }
 
         .screen { display: none; width: 100%; max-width: 550px; padding: 15px; box-sizing: border-box; flex-direction: column; align-items: center; }
         .active { display: flex; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* UI */
+        /* Stats Balk */
         .stats-wrapper {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
             background: var(--card-bg); padding: 12px; border-radius: 15px;
@@ -46,33 +46,34 @@
         }
         .stat-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 600; justify-content: center; }
 
+        /* Knoppen */
         .btn {
-            width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 12px;
+            width: 100%; padding: 18px; margin: 8px 0; border: none; border-radius: 15px;
             background: white; color: var(--primary); font-size: 1.1rem; font-weight: 600;
             cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s;
             display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .btn:active { transform: scale(0.98); }
+        .btn:active { transform: scale(0.98); background: #f0f0f0; }
         .btn-orange { color: var(--bridge-color); border: 2px solid var(--bridge-color); }
-        .btn-back { background: #dfe6e9; color: #636e72; margin-top: 15px; width: auto; min-width: 120px; }
+        .btn-back { background: #dfe6e9; color: #636e72; margin-top: 15px; width: auto; min-width: 120px; padding: 12px; }
 
-        /* Raster */
+        /* Raster Spel */
         #grid-container { position: relative; background: rgba(0,0,0,0.05); border-radius: 12px; border: 5px solid rgba(255,255,255,0.5); margin: 0 auto; }
         .cell { position: absolute; background: white; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: top 0.4s, left 0.4s; color: var(--primary); box-shadow: 0 3px 0 #dfe6e9; box-sizing: border-box; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
-        .cell.cpu-hint { background: var(--accent) !important; border: 2px solid #f39c12; }
+        .cell.cpu-hint { background: var(--accent) !important; border: 2px solid #f39c12; box-shadow: 0 0 10px var(--accent); }
         .cell.exploding { transform: scale(0); opacity: 0; pointer-events: none; }
 
-        /* Brugmethode */
+        /* Brugmethode / Splitsen */
         .bridge-box { background: white; padding: 25px 15px; border-radius: 25px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; }
-        .sum-row { font-size: 2.8rem; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
-        .split-svg { width: 160px; height: 50px; }
-        .split-line { stroke: var(--bridge-color); stroke-width: 4; stroke-linecap: round; }
-        .work-row { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.6rem; font-weight: 600; }
+        .sum-row { font-size: 3rem; font-weight: 600; color: var(--primary); margin-bottom: 5px; }
+        .split-svg { width: 180px; height: 60px; }
+        .split-line { stroke: var(--bridge-color); stroke-width: 5; stroke-linecap: round; fill: none; }
+        .work-row { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.8rem; font-weight: 600; }
         
         .num-input { 
-            width: 55px; height: 55px; border: 3px solid #eee; border-radius: 12px;
-            text-align: center; font-size: 1.6rem; font-family: 'Fredoka'; 
+            width: 60px; height: 60px; border: 3px solid #eee; border-radius: 12px;
+            text-align: center; font-size: 1.8rem; font-family: 'Fredoka'; 
             color: var(--primary); outline: none; background: white;
             -webkit-appearance: none; margin: 0;
         }
@@ -87,23 +88,26 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 3.0</div>
+        <div class="version">Versie 3.1</div>
     </div>
 
+    <!-- 1. HOOFDMENU -->
     <div id="main-menu" class="screen active">
         <h2 style="margin-bottom: 20px;">Kies een opdracht:</h2>
         <button class="btn" onclick="openMode('som10')">✨ De som van 10</button>
         <button class="btn btn-orange" onclick="openMode('bridge')">🌉 Optellen over 10</button>
     </div>
 
+    <!-- 2. SUBMENU SOM VAN 10 -->
     <div id="som10-menu" class="screen">
         <button class="btn" onclick="prepareGrid(1)">🧩 Klassiek Raster</button>
         <button class="btn" onclick="prepareGrid(2)">🤖 Computer Kiest</button>
         <button class="btn" onclick="startKeyboardRace()">⌨️ Toetsenbord Race</button>
         <button class="btn" onclick="prepareGrid(4)">🪐 Gravity Mode</button>
-        <button class="btn btn-back" onclick="showScreen('main-menu')">Terug</button>
+        <button class="btn btn-back" onclick="showScreen('main-menu')">Terug naar Start</button>
     </div>
 
+    <!-- 3. LEVEL SELECTIE -->
     <div id="level-screen" class="screen">
         <h2 id="level-title">Kies een niveau</h2>
         <button class="btn" onclick="finalizeGridStart(6)">🟢 Makkelijk (6x6)</button>
@@ -112,7 +116,8 @@
         <button class="btn btn-back" onclick="showScreen('som10-menu')">Terug</button>
     </div>
 
-    <div id="bridge-game" class="screen">
+    <!-- 4. BRUGMETHODE SPEL -->
+    <div id="bridge-game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="bridge-score">0</span></div>
             <div class="stat-item">⏱️ <span id="bridge-timer">0</span>s</div>
@@ -120,8 +125,8 @@
         <div class="bridge-box">
             <div class="sum-row"><span id="b-n1">8</span> + <span id="b-n2" style="color:var(--bridge-color)">5</span> = ?</div>
             <svg class="split-svg" viewBox="0 0 200 60">
-                <line x1="100" y1="5" x2="50" y2="55" class="split-line" />
-                <line x1="100" y1="5" x2="150" y2="55" class="split-line" />
+                <line x1="100" y1="5" x2="55" y2="55" class="split-line" />
+                <line x1="100" y1="5" x2="145" y2="55" class="split-line" />
             </svg>
             <div class="work-row">
                 <span id="c-n1">8</span> + 
@@ -134,6 +139,7 @@
         <button class="btn btn-back" onclick="showScreen('main-menu')">🏠 Menu</button>
     </div>
 
+    <!-- 5. GRID & KEYBOARD SPEL SCHERM -->
     <div id="game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="stat-score">0</span></div>
@@ -150,39 +156,46 @@
         </div>
         <div id="msg"></div>
         <button id="retry-btn" class="btn" style="background:var(--secondary); color:white; display:none;" onclick="restartGame()">🔄 Opnieuw</button>
-        <button class="btn btn-back" onclick="exitGame()">🏠 Menu</button>
+        <button class="btn btn-back" onclick="showScreen('main-menu')">🏠 Menu</button>
     </div>
 
     <script>
         let config = { mode: '', type: 0, size: 8 };
         let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, selected: null, cpuTarget: null, isGameOver: false };
+        let bData = { n1: 0, n2: 0, s1: 0, s2: 0, tot: 0 };
         let timerInterval;
         let grid = [];
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            const target = document.getElementById(id);
+            if(target) target.classList.add('active');
             clearInterval(timerInterval);
             state.isGameOver = false;
         }
 
         function openMode(mode) {
             config.mode = mode;
-            showScreen(mode === 'som10' ? 'som10-menu' : 'bridge-game');
-            if(mode === 'bridge') startBridge();
+            if(mode === 'som10') {
+                showScreen('som10-menu');
+            } else {
+                showScreen('bridge-game-screen');
+                startBridge();
+            }
         }
 
+        /* --- BRUGMETHODE LOGICA --- */
         function startBridge() {
             state.score = 0; state.seconds = 0;
-            document.getElementById('bridge-score').innerText = "0";
+            const scoreEl = document.getElementById('bridge-score');
+            if(scoreEl) scoreEl.innerText = "0";
             nextBridgeTask();
             startTimer('bridge-timer');
         }
 
         function nextBridgeTask() {
-            bData = {};
-            bData.n1 = Math.floor(Math.random() * 4) + 6;
-            bData.n2 = Math.floor(Math.random() * 4) + 5;
+            bData.n1 = Math.floor(Math.random() * 4) + 6; // 6, 7, 8, 9
+            bData.n2 = Math.floor(Math.random() * 4) + 5; // 5, 6, 7, 8
             bData.s1 = 10 - bData.n1;
             bData.s2 = bData.n2 - bData.s1;
             bData.tot = bData.n1 + bData.n2;
@@ -199,7 +212,7 @@
             const f1 = document.getElementById('s1');
             f1.readOnly = false;
             f1.focus();
-            document.getElementById('bridge-hint').innerText = `Vul aan tot 10...`;
+            document.getElementById('bridge-hint').innerText = `Maak 10: ${bData.n1} + ...`;
 
             f1.oninput = (e) => { if(parseInt(e.target.value) === bData.s1) moveBridgeFocus(e.target, 's2', `Splits de ${bData.n2}...`); };
             document.getElementById('s2').oninput = (e) => { if(parseInt(e.target.value) === bData.s2) moveBridgeFocus(e.target, 's3', `Tel alles samen...`); };
@@ -208,7 +221,7 @@
                 e.target.readOnly = true;
                 state.score += 50;
                 document.getElementById('bridge-score').innerText = state.score;
-                setTimeout(nextBridgeTask, 400); 
+                setTimeout(nextBridgeTask, 600); 
             }};
         }
 
@@ -221,6 +234,7 @@
             document.getElementById('bridge-hint').innerText = hint;
         }
 
+        /* --- SOM VAN 10 LOGICA --- */
         function prepareGrid(type) { config.type = type; showScreen('level-screen'); }
         function finalizeGridStart(size) { config.size = size; startActualGame('grid'); }
         function startKeyboardRace() { config.type = 3; startActualGame('kb'); }
@@ -348,7 +362,7 @@
             if(sScore) sScore.innerText = state.score;
             if(sErrors) sErrors.innerText = state.errors;
             if(sHigh) {
-                const key = `rec_v30_${config.type}_${config.size}`;
+                const key = `rec_v31_${config.type}_${config.size}`;
                 let high = localStorage.getItem(key) || 0;
                 if(state.score > high) { high = state.score; localStorage.setItem(key, high); }
                 sHigh.innerText = high;
@@ -379,4 +393,10 @@
         }
 
         function restartGame() {
-            if(config.type === 3) sta
+            if(config.type === 3) startActualGame('kb'); else startActualGame('grid');
+        }
+
+        function exitGame() { showScreen('main-menu'); }
+    </script>
+</body>
+</html>
