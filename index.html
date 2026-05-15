@@ -40,11 +40,12 @@
 
         /* UI Stats */
         .stats-wrapper {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
             background: var(--card-bg); padding: 10px; border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; margin-bottom: 15px; border: 2px solid white;
         }
-        .stat-item { display: flex; align-items: center; gap: 5px; font-size: 0.9rem; font-weight: 600; justify-content: center; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; font-size: 0.8rem; font-weight: 600; justify-content: center; }
+        .stat-val { font-size: 1rem; color: var(--primary); }
 
         /* Knoppen */
         .btn {
@@ -64,7 +65,7 @@
         .cell.cpu-hint { background: var(--accent) !important; border: 2px solid #f39c12; }
         .cell.exploding { transform: scale(0); opacity: 0; pointer-events: none; }
 
-        /* BRUGMETHODE RESPONSIVE */
+        /* BRUGMETHODE */
         .bridge-box { 
             background: white; padding: clamp(15px, 5vw, 25px) 10px; border-radius: 25px; 
             width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
@@ -89,6 +90,12 @@
         .num-input:focus { border-color: var(--secondary); background: #fff; }
         .num-input.correct { border-color: var(--secondary); background: #e8fffb; color: #00b894; }
         .num-input[readonly] { background-color: #f9f9f9; color: #aaa; }
+        
+        .hidden-step {
+            width: clamp(45px, 14vw, 60px); height: clamp(45px, 14vw, 60px); 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: var(--bridge-color); font-weight: bold;
+        }
 
         #msg { height: 40px; margin-top: 10px; font-size: 1.1rem; font-weight: 600; text-align: center; color: var(--primary); }
     </style>
@@ -97,21 +104,29 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 3.2</div>
+        <div class="version">Versie 3.4</div>
     </div>
 
     <!-- 1. HOOFDMENU -->
     <div id="main-menu" class="screen active">
         <h2 style="margin-bottom: 15px; font-size: 1.2rem;">Maak een keuze:</h2>
         <button class="btn" onclick="openMode('som10')">✨ De som van 10</button>
-        <button class="btn btn-orange" onclick="openMode('bridge')">🌉 Optellen over 10</button>
+        <button class="btn btn-orange" onclick="openMode('bridge-selection')">🌉 Optellen over 10</button>
+    </div>
+
+    <!-- 1b. BRUG SELECTIE MENU -->
+    <div id="bridge-selection-menu" class="screen">
+        <h2 style="margin-bottom: 15px; font-size: 1.2rem;">Kies een variant:</h2>
+        <button class="btn btn-orange" onclick="startBridge('normal')">📝 Stap voor Stap</button>
+        <button class="btn btn-orange" onclick="startBridge('mental')">🧠 Onthoud de Rest</button>
+        <button class="btn btn-back" onclick="showScreen('main-menu')">Terug</button>
     </div>
 
     <!-- 2. SUBMENU SOM VAN 10 -->
     <div id="som10-menu" class="screen">
         <button class="btn" onclick="prepareGrid(1)">🧩 Klassiek Raster</button>
         <button class="btn" onclick="prepareGrid(2)">🤖 Computer Kiest</button>
-        <button class="btn" onclick="startKeyboardRace()">⌨️ Toetsenbord Race</button>
+        <button class="btn" onclick="openKeyboardRace()">⌨️ Toetsenbord Race</button>
         <button class="btn" onclick="prepareGrid(4)">🪐 Gravity Mode</button>
         <button class="btn btn-back" onclick="showScreen('main-menu')">Terug</button>
     </div>
@@ -128,8 +143,10 @@
     <!-- 4. BRUGMETHODE SPEL -->
     <div id="bridge-game-screen" class="screen">
         <div class="stats-wrapper">
-            <div class="stat-item">⭐ <span id="bridge-score">0</span></div>
-            <div class="stat-item">⏱️ <span id="bridge-timer">0</span>s</div>
+            <div class="stat-item">⭐ <span id="bridge-score" class="stat-val">0</span></div>
+            <div class="stat-item">⏱️ <span id="bridge-timer" class="stat-val">0</span>s</div>
+            <div class="stat-item">✅ <span id="bridge-correct" class="stat-val">0</span></div>
+            <div class="stat-item">❌ <span id="bridge-errors" class="stat-val">0</span></div>
         </div>
         <div class="bridge-box">
             <div class="sum-row"><span id="b-n1">8</span>+<span id="b-n2" style="color:var(--bridge-color)">5</span>=?</div>
@@ -138,7 +155,7 @@
                 <line x1="100" y1="5" x2="145" y2="55" class="split-line" />
             </svg>
             <div class="work-row">
-                <span id="c-n1">8</span>+<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">+<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">=<input type="number" id="s3" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                <span id="c-n1">8</span>+<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">+<div id="s2-container"><input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div>=<input type="number" id="s3" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
             </div>
             <div id="bridge-hint" style="margin-top:10px; font-size: 0.9rem; font-weight:600; color:#636e72; height: 1.2em;"></div>
         </div>
@@ -148,10 +165,10 @@
     <!-- 5. GRID & KEYBOARD SPEL SCHERM -->
     <div id="game-screen" class="screen">
         <div class="stats-wrapper">
-            <div class="stat-item">⭐ <span id="stat-score">0</span></div>
-            <div class="stat-item">⏱️ <span id="stat-timer">0</span>s</div>
-            <div class="stat-item">❌ <span id="stat-errors">0</span></div>
-            <div class="stat-item">🏆 <span id="stat-high">0</span></div>
+            <div class="stat-item">⭐ <span id="stat-score" class="stat-val">0</span></div>
+            <div class="stat-item">⏱️ <span id="stat-timer" class="stat-val">0</span>s</div>
+            <div class="stat-item">❌ <span id="stat-errors" class="stat-val">0</span></div>
+            <div class="stat-item">🏆 <span id="stat-high" class="stat-val">0</span></div>
         </div>
         <div id="grid-container"></div>
         <div id="kb-area" style="display:none; background:white; padding:20px; border-radius:20px; width:100%; text-align:center; box-sizing:border-box;">
@@ -162,15 +179,32 @@
         </div>
         <div id="msg"></div>
         <button id="retry-btn" class="btn" style="background:var(--secondary); color:white; display:none;" onclick="restartGame()">🔄 Opnieuw</button>
-        <button class="btn btn-back" onclick="showScreen('main-menu')">🏠 Menu</button>
+        <button class="btn btn-back" onclick="exitGame()">🏠 Menu</button>
     </div>
 
     <script>
-        let config = { mode: '', type: 0, size: 8 };
-        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, selected: null, cpuTarget: null, isGameOver: false };
+        let config = { mode: '', type: 0, size: 8, bridgeSubMode: 'normal' };
+        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, bridgeCorrect: 0, bridgeErrors: 0, selected: null, cpuTarget: null, isGameOver: false };
         let bData = { n1: 0, n2: 0, s1: 0, s2: 0, tot: 0 };
         let timerInterval;
         let grid = [];
+
+        // GELUIDSENGINE
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(freq, type, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+        function soundCorrect() { playSound(880, 'sine', 0.2); setTimeout(() => playSound(1109, 'sine', 0.3), 100); }
+        function soundError() { playSound(150, 'sawtooth', 0.4); }
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -183,12 +217,15 @@
         function openMode(mode) {
             config.mode = mode;
             if(mode === 'som10') { showScreen('som10-menu'); } 
-            else { showScreen('bridge-game-screen'); startBridge(); }
+            else if(mode === 'bridge-selection') { showScreen('bridge-selection-menu'); }
         }
 
-        function startBridge() {
-            state.score = 0; state.seconds = 0;
-            document.getElementById('bridge-score').innerText = "0";
+        /* BRUGMETHODE LOGICA */
+        function startBridge(subMode) {
+            config.bridgeSubMode = subMode;
+            showScreen('bridge-game-screen');
+            state.score = 0; state.seconds = 0; state.bridgeCorrect = 0; state.bridgeErrors = 0;
+            updateBridgeStats();
             nextBridgeTask();
             startTimer('bridge-timer');
         }
@@ -204,9 +241,17 @@
             document.getElementById('b-n2').innerText = bData.n2;
             document.getElementById('c-n1').innerText = bData.n1;
             
+            // Reset de inputs en UI containers
+            const s2Container = document.getElementById('s2-container');
+            if (config.bridgeSubMode === 'mental') {
+                s2Container.innerHTML = '<div class="hidden-step">?</div>';
+            } else {
+                s2Container.innerHTML = '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
+            }
+
             ['s1', 's2', 's3'].forEach(id => { 
                 const el = document.getElementById(id);
-                el.value = ""; el.classList.remove('correct'); el.readOnly = true;
+                if(el) { el.value = ""; el.classList.remove('correct'); el.readOnly = true; }
             });
 
             const f1 = document.getElementById('s1');
@@ -214,29 +259,76 @@
             f1.focus();
             document.getElementById('bridge-hint').innerText = `Maak 10: ${bData.n1} + ...`;
 
-            f1.oninput = (e) => { if(parseInt(e.target.value) === bData.s1) moveBridgeFocus(e.target, 's2', `Splits de ${bData.n2}...`); };
-            document.getElementById('s2').oninput = (e) => { if(parseInt(e.target.value) === bData.s2) moveBridgeFocus(e.target, 's3', `Tel alles samen...`); };
-            document.getElementById('s3').oninput = (e) => { if(parseInt(e.target.value) === bData.tot) {
-                e.target.classList.add('correct');
-                e.target.readOnly = true;
-                state.score += 50;
-                document.getElementById('bridge-score').innerText = state.score;
-                setTimeout(nextBridgeTask, 500); 
-            }};
+            f1.oninput = (e) => {
+                const val = parseInt(e.target.value);
+                if (val === bData.s1) {
+                    e.target.classList.add('correct');
+                    e.target.readOnly = true;
+                    if (config.bridgeSubMode === 'mental') {
+                        // In mental mode springen we direct naar de einduitkomst
+                        const f3 = document.getElementById('s3');
+                        f3.readOnly = false;
+                        f3.focus();
+                        document.getElementById('bridge-hint').innerText = `Onthoud de rest... Wat is de uitkomst?`;
+                    } else {
+                        const f2 = document.getElementById('s2');
+                        f2.readOnly = false;
+                        f2.focus();
+                        document.getElementById('bridge-hint').innerText = `Splits de ${bData.n2}...`;
+                        f2.oninput = (ev) => checkBridgeInput(ev.target, bData.s2, 's3', `Tel alles samen...`);
+                    }
+                } else if (e.target.value.length >= 1) {
+                    registerBridgeError(e.target);
+                }
+            };
+
+            document.getElementById('s3').oninput = (e) => {
+                const val = parseInt(e.target.value);
+                if (val === bData.tot) {
+                    soundCorrect();
+                    e.target.classList.add('correct');
+                    e.target.readOnly = true;
+                    state.score += 50;
+                    state.bridgeCorrect++;
+                    updateBridgeStats();
+                    setTimeout(nextBridgeTask, 800);
+                } else if (e.target.value.length >= 2) {
+                    registerBridgeError(e.target);
+                }
+            };
         }
 
-        function moveBridgeFocus(cur, nextId, hint) {
-            cur.classList.add('correct');
-            cur.readOnly = true;
-            const next = document.getElementById(nextId);
-            next.readOnly = false;
-            next.focus();
-            document.getElementById('bridge-hint').innerText = hint;
+        function checkBridgeInput(el, target, nextId, hint) {
+            const val = parseInt(el.value);
+            if (val === target) {
+                el.classList.add('correct');
+                el.readOnly = true;
+                const next = document.getElementById(nextId);
+                next.readOnly = false;
+                next.focus();
+                document.getElementById('bridge-hint').innerText = hint;
+            } else if (el.value.length >= 1) {
+                registerBridgeError(el);
+            }
         }
 
+        function registerBridgeError(el) {
+            soundError();
+            state.bridgeErrors++;
+            updateBridgeStats();
+            el.value = "";
+        }
+
+        function updateBridgeStats() {
+            document.getElementById('bridge-score').innerText = state.score;
+            document.getElementById('bridge-correct').innerText = state.bridgeCorrect;
+            document.getElementById('bridge-errors').innerText = state.bridgeErrors;
+        }
+
+        /* SOM VAN 10 LOGICA (V3.3 INTEGRAAL) */
         function prepareGrid(type) { config.type = type; showScreen('level-screen'); }
         function finalizeGridStart(size) { config.size = size; startActualGame('grid'); }
-        function startKeyboardRace() { config.type = 3; startActualGame('kb'); }
+        function openKeyboardRace() { config.type = 3; startActualGame('kb'); }
 
         function startActualGame(uiType) {
             state.score = 0; state.errors = 0; state.seconds = 0; state.lastTime = Date.now();
@@ -287,18 +379,19 @@
                 if(state.cpuTarget && clicked.val + state.cpuTarget.val === 10 && clicked !== state.cpuTarget) {
                     removePair(clicked, state.cpuTarget); state.cpuTarget = null;
                     if(!checkWin()) setTimeout(cpuPick, 500);
-                } else { state.errors++; updateStats(); }
+                } else { state.errors++; soundError(); updateStats(); }
                 return;
             }
             if(!state.selected) { state.selected = clicked; clicked.el.classList.add('selected'); }
             else {
                 if(state.selected === clicked) { clicked.el.classList.remove('selected'); state.selected = null; }
                 else if(state.selected.val + clicked.val === 10) { removePair(state.selected, clicked); state.selected = null; checkWin(); }
-                else { state.errors++; updateStats(); state.selected.el.classList.remove('selected'); state.selected = null; }
+                else { state.errors++; soundError(); updateStats(); state.selected.el.classList.remove('selected'); state.selected = null; }
             }
         }
 
         function removePair(c1, c2) {
+            soundCorrect();
             const now = Date.now();
             state.score += Math.max(10, Math.floor(100 - ((now - state.lastTime)/1000)*8));
             state.lastTime = now; updateStats();
@@ -341,26 +434,27 @@
             input.value = ""; input.focus();
             input.oninput = () => {
                 if(parseInt(input.value) + n1 === 10) {
+                    soundCorrect();
                     state.score += 50; state.lastTime = Date.now(); updateStats();
                     n1 = Math.floor(Math.random()*9)+1; n1el.innerText = n1;
                     input.value = ""; input.focus();
                 } else if(input.value.length >= 1) {
-                    state.errors++; updateStats(); input.value = "";
+                    state.errors++; soundError(); updateStats(); input.value = "";
                 }
             };
         }
 
         function updateStats() {
-            const sScore = document.getElementById('stat-score');
-            const sErrors = document.getElementById('stat-errors');
-            const sHigh = document.getElementById('stat-high');
-            if(sScore) sScore.innerText = state.score;
-            if(sErrors) sErrors.innerText = state.errors;
-            if(sHigh) {
-                const key = `rec_v32_${config.type}_${config.size}`;
+            const elScore = document.getElementById('stat-score');
+            const elErrors = document.getElementById('stat-errors');
+            const elHigh = document.getElementById('stat-high');
+            if(elScore) elScore.innerText = state.score;
+            if(elErrors) elErrors.innerText = state.errors;
+            if(elHigh) {
+                const key = `rec_v34_${config.type}_${config.size}`;
                 let high = localStorage.getItem(key) || 0;
                 if(state.score > high) { high = state.score; localStorage.setItem(key, high); }
-                sHigh.innerText = high;
+                elHigh.innerText = high;
             }
         }
 
