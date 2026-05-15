@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Som van 10 - Versie 2.2</title>
+    <title>Rekenhub - Versie 2.5</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
 
         :root {
             --primary: #6c5ce7;
             --secondary: #00cec9;
+            --bridge-color: #fd9644;
             --accent: #fab1a0;
             --danger: #ff7675;
             --bg-gradient: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 100%);
@@ -28,391 +29,290 @@
             min-height: 100vh;
         }
 
-        /* Titels & Versie */
-        .header-container {
-            text-align: center;
-            margin: 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
+        .header-container { text-align: center; margin: 20px 0; }
         h1 { margin: 0; font-size: 2.5rem; color: var(--primary); }
         .version { font-size: 1rem; color: #636e72; font-weight: 600; margin-top: -5px; }
 
-        /* Schermen */
-        .screen { display: none; width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; }
+        .screen { display: none; width: 100%; max-width: 550px; padding: 20px; box-sizing: border-box; flex-direction: column; align-items: center; }
         .active { display: flex; animation: fadeIn 0.4s ease-out; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Stats Bar */
-        #stats-bar {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            width: 100%;
-            margin-bottom: 20px;
-            border: 2px solid white;
+        /* Algemene UI */
+        #stats-bar, #stats-bar-bridge {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+            background: var(--card-bg); padding: 15px; border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; margin-bottom: 20px; border: 2px solid white;
         }
-        .stat-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 600; }
-        .stat-icon { font-size: 1.2rem; }
+        .stat-item { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 600; justify-content: center; }
 
-        /* Knoppen Menu */
         .btn {
-            width: 100%;
-            padding: 18px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 15px;
-            background: white;
-            color: var(--primary);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%; padding: 18px; margin: 10px 0; border: none; border-radius: 15px;
+            background: white; color: var(--primary); font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: 2px solid transparent;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .btn:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); border-color: var(--primary); }
+        .btn:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); background: var(--primary); color: white; }
+        .btn-orange { color: var(--bridge-color); border: 2px solid var(--bridge-color); }
+        .btn-orange:hover { background: var(--bridge-color); color: white; }
         .btn-back { background: #dfe6e9; color: #636e72; margin-top: 20px; width: auto; min-width: 150px; }
 
-        /* Spel Raster */
-        #grid-container {
-            position: relative;
-            background: rgba(0,0,0,0.05);
-            border-radius: 15px;
-            border: 8px solid rgba(255,255,255,0.5);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+        /* Som van 10 CSS (Behouden) */
+        #grid-container { position: relative; background: rgba(0,0,0,0.05); border-radius: 15px; border: 8px solid rgba(255,255,255,0.5); }
+        .cell { position: absolute; background: white; display: flex; justify-content: center; align-items: center; font-size: 1.4rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: top 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), left 0.3s, background 0.3s; color: var(--primary); box-shadow: 0 4px 0 #dfe6e9; }
+        .cell.selected { background: var(--primary); color: white; }
+        .cell.exploding { transform: scale(0) rotate(180deg); opacity: 0; pointer-events: none; }
+        #kb-area { background: var(--card-bg); padding: 30px; border-radius: 25px; font-size: 2.5rem; text-align: center; }
+        #kb-input { width: 80px; font-size: 2.5rem; border: 4px solid var(--secondary); border-radius: 15px; text-align: center; outline: none; }
+
+        /* BRUGMETHODE SPECIFIEK */
+        .bridge-container {
+            background: white; padding: 40px 20px; border-radius: 30px; 
+            width: 100%; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; align-items: center;
         }
-
-        .cell {
-            position: absolute;
-            background: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.4rem;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            user-select: none;
-            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), left 0.3s, background 0.3s, transform 0.2s;
-            box-sizing: border-box;
-            color: var(--primary);
-            box-shadow: 0 4px 0 #dfe6e9;
+        .bridge-sum-display {
+            font-size: 3.5rem; font-weight: 600; color: var(--primary);
+            display: flex; gap: 15px; margin-bottom: 5px; align-items: center;
         }
+        .second-number { color: var(--bridge-color); position: relative; padding: 0 10px; }
+        
+        /* De splitsbeentjes (SVG) */
+        .split-svg { width: 200px; height: 60px; margin: -10px 0; }
+        .split-line { stroke: var(--bridge-color); stroke-width: 4; stroke-linecap: round; fill: none; }
 
-        .cell:hover { background: #f9f9f9; transform: scale(1.02); }
-        .cell.selected { background: var(--primary); color: white; transform: scale(0.9); box-shadow: 0 0 15px var(--primary); }
-        .cell.cpu-hint { background: var(--accent); color: white; border: 3px solid #e17055; animation: bounce 1s infinite; }
-        .cell.exploding { transform: scale(0) rotate(180deg); opacity: 0; }
-
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-        /* Keyboard area */
-        #kb-area { 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 25px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            font-size: 2.5rem; 
-            text-align: center;
+        .bridge-work-row {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; font-size: 2rem; font-weight: 600;
         }
-        #kb-input { 
-            width: 80px; 
-            padding: 5px;
-            font-family: 'Fredoka', sans-serif;
-            font-size: 2.5rem; 
-            border: 4px solid var(--secondary); 
-            border-radius: 15px; 
-            text-align: center; 
-            color: var(--primary);
-            outline: none;
+        .bridge-input {
+            width: 65px; height: 65px; border: 4px solid #eee; border-radius: 15px;
+            text-align: center; font-size: 1.8rem; font-family: 'Fredoka';
+            color: var(--primary); outline: none; transition: 0.3s;
         }
+        .bridge-input:focus { border-color: var(--bridge-color); box-shadow: 0 0 15px rgba(253, 150, 68, 0.2); }
+        .bridge-input.correct { border-color: var(--secondary); background: #e8fffb; color: #00b894; }
 
-        #msg { height: 40px; margin-top: 15px; font-size: 1.2rem; font-weight: 600; color: #d63031; text-align: center; }
-
-        /* Decoratie afbeelding/icoon */
-        .game-icon-top { font-size: 3rem; margin-bottom: 10px; }
+        #bridge-hint { margin-top: 25px; font-size: 1.1rem; color: #636e72; height: 1.5em; font-weight: 600; }
+        #msg { height: 50px; margin-top: 15px; font-size: 1.4rem; font-weight: 600; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="header-container">
-        <h1>🔢 Som van 10</h1>
-        <div class="version">Versie 2.2</div>
+        <h1>🔢 Reken Trainer</h1>
+        <div class="version">Versie 2.5</div>
     </div>
 
-    <!-- MENU -->
-    <div id="menu-screen" class="screen active">
-        <div class="game-icon-top">🎨</div>
+    <!-- HOOFDMENU -->
+    <div id="main-mode-screen" class="screen active">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🚀</div>
+        <h2 style="margin-bottom: 30px;">Kies je uitdaging:</h2>
+        <button class="btn" onclick="openSomVan10()">✨ De som van 10</button>
+        <button class="btn btn-orange" onclick="openBrugmethode()">🌉 Optellen over 10 (Brug)</button>
+    </div>
+
+    <!-- MENU SOM VAN 10 (ONGEWIJZIGD) -->
+    <div id="menu-screen" class="screen">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🎨</div>
         <button class="btn" onclick="showLevelSelect(1)"><span>🧩</span> Klassiek Raster</button>
         <button class="btn" onclick="showLevelSelect(2)"><span>🤖</span> Computer Kiest</button>
         <button class="btn" onclick="openKeyboardGame()"><span>⌨️</span> Toetsenbord Race</button>
         <button class="btn" onclick="showLevelSelect(4)"><span>🪐</span> Gravity Mode</button>
+        <button class="btn btn-back" onclick="showScreen('main-mode-screen')">Terug</button>
     </div>
 
-    <!-- LEVEL SELECTIE -->
+    <!-- BRUGMETHODE SCHERM -->
+    <div id="bridge-screen" class="screen">
+        <div id="stats-bar-bridge">
+            <div class="stat-item">⭐ <span id="bridge-score">0</span></div>
+            <div class="stat-item">⏱️ <span id="bridge-timer">0</span>s</div>
+        </div>
+        
+        <div class="bridge-container">
+            <div class="bridge-sum-display">
+                <span id="b-main-n1">8</span> + <span id="b-main-n2" class="second-number">5</span> = ?
+            </div>
+
+            <!-- Splitsbeentjes -->
+            <svg class="split-svg" viewBox="0 0 200 60">
+                <line x1="100" y1="5" x2="45" y2="55" class="split-line" />
+                <line x1="100" y1="5" x2="155" y2="55" class="split-line" />
+            </svg>
+
+            <div class="bridge-work-row">
+                <span id="calc-n1">8</span> + 
+                <input type="number" id="step1" class="bridge-input" placeholder="?"> + 
+                <input type="number" id="step2" class="bridge-input" placeholder="?"> = 
+                <input type="number" id="step3" class="bridge-input" placeholder="?">
+            </div>
+            <div id="bridge-hint">Aanvullen tot 10...</div>
+        </div>
+
+        <div id="bridge-msg" style="margin-top:20px; font-weight:bold; font-size:1.5rem; color:var(--secondary);"></div>
+        <button class="btn btn-back" onclick="showScreen('main-mode-screen')">🏠 Hoofdmenu</button>
+    </div>
+
+    <!-- LEVEL SELECTIE & GAME SOM VAN 10 (ONGEWIJZIGD) -->
     <div id="level-screen" class="screen">
-        <h2 id="level-title">Kies Niveau</h2>
+        <h2 id="level-title">Niveau</h2>
         <button class="btn" onclick="startGridGame(6)">🟢 Makkelijk (6x6)</button>
         <button class="btn" onclick="startGridGame(8)">🟡 Gemiddeld (8x8)</button>
         <button class="btn" onclick="startGridGame(10)">🔴 Moeilijk (10x10)</button>
         <button class="btn btn-back" onclick="showScreen('menu-screen')">Terug</button>
     </div>
 
-    <!-- GAME SCHERM -->
     <div id="game-screen" class="screen">
         <div id="stats-bar">
-            <div class="stat-item"><span class="stat-icon">⭐</span> <span id="stat-score">0</span></div>
-            <div class="stat-item"><span class="stat-icon">⏱️</span> <span id="stat-timer">0</span>s</div>
-            <div class="stat-item"><span class="stat-icon">❌</span> <span id="stat-errors">0</span></div>
-            <div class="stat-item"><span class="stat-icon">🏆</span> <span id="stat-high">0</span></div>
+            <div class="stat-item">⭐ <span id="stat-score">0</span></div>
+            <div class="stat-item">⏱️ <span id="stat-timer">0</span>s</div>
+            <div class="stat-item">❌ <span id="stat-errors">0</span></div>
+            <div class="stat-item">🏆 <span id="stat-high">0</span></div>
         </div>
-
         <div id="grid-container"></div>
-
         <div id="kb-area" style="display:none;">
-            <span id="num1">?</span> + <input type="number" id="kb-input" autofocus> = 10
+            <span id="num1">?</span> + <input type="number" id="kb-input"> = 10
         </div>
-
         <div id="msg"></div>
+        <button id="retry-btn" class="btn" style="background:var(--secondary); color:white; display:none;" onclick="restartCurrentLevel()">🔄 Opnieuw</button>
         <button class="btn btn-back" onclick="exitGame()">🏠 Menu</button>
     </div>
 
     <script>
         let config = { type: 1, size: 8, cellSize: 0 };
-        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, selected: null, cpuTarget: null };
+        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, selected: null, cpuTarget: null, isGameOver: false };
         let timerInterval;
         let grid = [];
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            clearInterval(timerInterval);
         }
 
-        function showLevelSelect(type) {
-            config.type = type;
-            const titels = ["", "🧩 Klassiek", "🤖 Computer Kiest", "", "🪐 Gravity Mode"];
-            document.getElementById('level-title').innerText = titels[type];
-            showScreen('level-screen');
+        function openSomVan10() { showScreen('menu-screen'); }
+
+        /* BRUGMETHODE LOGICA */
+        let bData = { n1: 0, n2: 0, s1: 0, s2: 0, tot: 0 };
+
+        function openBrugmethode() {
+            showScreen('bridge-screen');
+            state.score = 0; state.seconds = 0;
+            document.getElementById('bridge-score').innerText = "0";
+            newBridgeProblem();
+            startTimer('bridge-timer');
         }
 
-        function openKeyboardGame() {
-            config.type = 3;
-            resetState();
-            showScreen('game-screen');
-            document.getElementById('grid-container').style.display = 'none';
-            document.getElementById('kb-area').style.display = 'block';
-            initKeyboardGame();
-            startTimer();
-        }
+        function newBridgeProblem() {
+            bData.n1 = Math.floor(Math.random() * 4) + 6; // 6, 7, 8, 9
+            bData.n2 = Math.floor(Math.random() * 4) + 5; // 5, 6, 7, 8
+            bData.s1 = 10 - bData.n1;
+            bData.s2 = bData.n2 - bData.s1;
+            bData.tot = bData.n1 + bData.n2;
 
-        function startGridGame(size) {
-            config.size = size;
-            resetState();
-            showScreen('game-screen');
-            document.getElementById('grid-container').style.display = 'block';
-            document.getElementById('kb-area').style.display = 'none';
+            document.getElementById('b-main-n1').innerText = bData.n1;
+            document.getElementById('b-main-n2').innerText = bData.n2;
+            document.getElementById('calc-n1').innerText = bData.n1;
             
-            const containerWidth = Math.min(window.innerWidth - 40, 460);
-            config.cellSize = Math.floor(containerWidth / config.size);
-            
-            initGrid();
-            startTimer();
-        }
+            const ids = ['step1', 'step2', 'step3'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                el.value = ""; el.classList.remove('correct'); el.disabled = true;
+            });
 
-        function resetState() {
-            state = { score: 0, errors: 0, seconds: 0, lastTime: Date.now(), selected: null, cpuTarget: null };
-            document.getElementById('msg').innerText = "";
-            updateStatsUI();
-        }
+            document.getElementById('step1').disabled = false;
+            document.getElementById('step1').focus();
+            document.getElementById('bridge-hint').innerText = `Maak 10: ${bData.n1} + ... = 10`;
 
-        function initGrid() {
-            const container = document.getElementById('grid-container');
-            container.innerHTML = '';
-            container.style.width = (config.size * config.cellSize) + 'px';
-            container.style.height = (config.size * config.cellSize) + 'px';
-            grid = [];
-
-            for (let r = 0; r < config.size; r++) {
-                for (let c = 0; c < config.size; c++) {
-                    const val = Math.floor(Math.random() * 9) + 1;
-                    const el = document.createElement('div');
-                    el.className = 'cell';
-                    el.innerText = val;
-                    el.style.width = (config.cellSize - 4) + 'px';
-                    el.style.height = (config.cellSize - 4) + 'px';
-                    
-                    const cellObj = { r, c, val, el };
-                    updateCellPosition(cellObj);
-                    
-                    el.onclick = () => handleCellClick(cellObj);
-                    container.appendChild(el);
-                    grid.push(cellObj);
+            document.getElementById('step1').oninput = (e) => {
+                if(parseInt(e.target.value) === bData.s1) {
+                    completeStep(e.target, 'step2', `Splits ${bData.n2}: ${bData.s1} en ...`);
                 }
-            }
-            if (config.type === 2) setTimeout(cpuPick, 800);
-        }
-
-        function updateCellPosition(cell) {
-            cell.el.style.top = (cell.r * config.cellSize + 2) + 'px';
-            cell.el.style.left = (cell.c * config.cellSize + 2) + 'px';
-        }
-
-        function handleCellClick(clicked) {
-            if (config.type === 2) {
-                if (state.cpuTarget && (clicked.val + state.cpuTarget.val === 10) && clicked !== state.cpuTarget) {
-                    removePair(clicked, state.cpuTarget);
-                    state.cpuTarget = null;
-                    if(!checkGameOver()) setTimeout(cpuPick, 700);
-                } else {
-                    registerError();
+            };
+            document.getElementById('step2').oninput = (e) => {
+                if(parseInt(e.target.value) === bData.s2) {
+                    completeStep(e.target, 'step3', `Alles samen: 10 + ${bData.s2} = ...`);
                 }
-                return;
-            }
-
-            if (!state.selected) {
-                state.selected = clicked;
-                clicked.el.classList.add('selected');
-            } else {
-                if (state.selected === clicked) {
-                    clicked.el.classList.remove('selected');
-                    state.selected = null;
-                } else if (state.selected.val + clicked.val === 10) {
-                    removePair(state.selected, clicked);
-                    state.selected = null;
-                    checkGameOver();
-                } else {
-                    registerError();
-                    state.selected.el.classList.remove('selected');
-                    state.selected = null;
-                }
-            }
-        }
-
-        function removePair(c1, c2) {
-            addScore();
-            c1.el.classList.add('exploding');
-            c2.el.classList.add('exploding');
-            
-            setTimeout(() => {
-                c1.el.remove();
-                c2.el.remove();
-                grid = grid.filter(c => c !== c1 && c !== c2);
-                if (config.type === 4) applyGravity();
-            }, 300);
-        }
-
-        function applyGravity() {
-            for (let c = 0; c < config.size; c++) {
-                let columnCells = grid.filter(cell => cell.c === c).sort((a, b) => b.r - a.r);
-                columnCells.forEach((cell, index) => {
-                    cell.r = (config.size - 1) - index;
-                    updateCellPosition(cell);
-                });
-            }
-        }
-
-        function cpuPick() {
-            let pairs = findPossiblePairs();
-            if (pairs.length > 0) {
-                const pair = pairs[Math.floor(Math.random() * pairs.length)];
-                state.cpuTarget = pair[0];
-                state.cpuTarget.el.classList.add('cpu-hint');
-            }
-        }
-
-        function findPossiblePairs() {
-            let pairs = [];
-            for (let i = 0; i < grid.length; i++) {
-                for (let j = i + 1; j < grid.length; j++) {
-                    if (grid[i].val + grid[j].val === 10) pairs.push([grid[i], grid[j]]);
-                }
-            }
-            return pairs;
-        }
-
-        function initKeyboardGame() {
-            const input = document.getElementById('kb-input');
-            const num1El = document.getElementById('num1');
-            let n1 = Math.floor(Math.random() * 9) + 1;
-            num1El.innerText = n1;
-            input.value = "";
-            input.focus();
-
-            input.oninput = () => {
-                if (parseInt(input.value) + n1 === 10) {
-                    addScore();
-                    n1 = Math.floor(Math.random() * 9) + 1;
-                    num1El.innerText = n1;
-                    input.value = "";
-                } else if (input.value.length >= 1) {
-                    registerError();
-                    input.value = "";
+            };
+            document.getElementById('step3').oninput = (e) => {
+                if(parseInt(e.target.value) === bData.tot) {
+                    e.target.classList.add('correct');
+                    e.target.disabled = true;
+                    state.score += 50;
+                    document.getElementById('bridge-score').innerText = state.score;
+                    document.getElementById('bridge-msg').innerText = "Perfect! 🌟";
+                    setTimeout(() => { document.getElementById('bridge-msg').innerText = ""; newBridgeProblem(); }, 1200);
                 }
             };
         }
 
-        function addScore() {
-            const now = Date.now();
-            const diff = (now - state.lastTime) / 1000;
-            const points = Math.max(10, Math.floor(100 - (diff * 8)));
-            state.score += points;
-            state.lastTime = now;
-            updateStatsUI();
+        function completeStep(current, nextId, hint) {
+            current.classList.add('correct');
+            current.disabled = true;
+            const next = document.getElementById(nextId);
+            next.disabled = false;
+            next.focus();
+            document.getElementById('bridge-hint').innerText = hint;
         }
 
-        function registerError() {
-            state.errors++;
-            document.getElementById('msg').innerText = "Oeps! Probeer opnieuw ❌";
-            setTimeout(() => document.getElementById('msg').innerText = "", 1000);
-            updateStatsUI();
+        /* SOM VAN 10 LOGICA (ONGEWIJZIGD VAN V2.3) */
+        function showLevelSelect(type) { config.type = type; showScreen('level-screen'); }
+        function openKeyboardGame() { config.type = 3; resetState(); showScreen('game-screen'); document.getElementById('grid-container').style.display = 'none'; document.getElementById('kb-area').style.display = 'block'; document.getElementById('retry-btn').style.display = 'none'; initKeyboardGame(); startTimer('stat-timer'); }
+        function startGridGame(size) { config.size = size; resetState(); showScreen('game-screen'); document.getElementById('grid-container').style.display = 'block'; document.getElementById('kb-area').style.display = 'none'; document.getElementById('retry-btn').style.display = 'none'; const w = Math.min(window.innerWidth - 40, 460); config.cellSize = Math.floor(w / config.size); initGrid(); startTimer('stat-timer'); }
+        function resetState() { state = { score: 0, errors: 0, seconds: 0, lastTime: Date.now(), selected: null, cpuTarget: null, isGameOver: false }; updateStatsUI(); }
+        function initGrid() {
+            const container = document.getElementById('grid-container'); container.innerHTML = ''; container.style.width = (config.size * config.cellSize) + 'px'; container.style.height = (config.size * config.cellSize) + 'px'; grid = [];
+            let values = []; for (let i = 0; i < (config.size * config.size) / 2; i++) { let v1 = Math.floor(Math.random() * 9) + 1; values.push(v1, 10 - v1); }
+            values.sort(() => Math.random() - 0.5);
+            let idx = 0;
+            for (let r = 0; r < config.size; r++) {
+                for (let c = 0; c < config.size; c++) {
+                    const val = values[idx++]; const el = document.createElement('div'); el.className = 'cell'; el.innerText = val; el.style.width = (config.cellSize - 4) + 'px'; el.style.height = (config.cellSize - 4) + 'px';
+                    const cellObj = { r, c, val, el }; updateCellPosition(cellObj); el.onclick = () => handleCellClick(cellObj); container.appendChild(el); grid.push(cellObj);
+                }
+            }
+            if (config.type === 2) setTimeout(cpuPick, 800);
         }
-
+        function updateCellPosition(cell) { cell.el.style.top = (cell.r * config.cellSize + 2) + 'px'; cell.el.style.left = (cell.c * config.cellSize + 2) + 'px'; }
+        function handleCellClick(clicked) {
+            if (state.isGameOver) return;
+            if (config.type === 2) {
+                if (state.cpuTarget && (clicked.val + state.cpuTarget.val === 10) && clicked !== state.cpuTarget) { removePair(clicked, state.cpuTarget); state.cpuTarget = null; if(!checkGameOver()) setTimeout(cpuPick, 700); }
+                else { state.errors++; updateStatsUI(); } return;
+            }
+            if (!state.selected) { state.selected = clicked; clicked.el.classList.add('selected'); }
+            else {
+                if (state.selected === clicked) { state.selected.el.classList.remove('selected'); state.selected = null; }
+                else if (state.selected.val + clicked.val === 10) { removePair(state.selected, clicked); state.selected = null; checkGameOver(); }
+                else { state.errors++; updateStatsUI(); state.selected.el.classList.remove('selected'); state.selected = null; }
+            }
+        }
+        function removePair(c1, c2) {
+            const now = Date.now(); state.score += Math.max(10, Math.floor(100 - ((now - state.lastTime)/1000) * 8)); state.lastTime = now; updateStatsUI();
+            c1.el.classList.add('exploding'); c2.el.classList.add('exploding');
+            setTimeout(() => { c1.el.remove(); c2.el.remove(); grid = grid.filter(c => c !== c1 && c !== c2); if (config.type === 4) { applyGravity(); setTimeout(checkGameOver, 600); } else { checkGameOver(); } }, 300);
+        }
+        function applyGravity() {
+            for (let c = 0; c < config.size; c++) {
+                let col = grid.filter(cell => cell.c === c).sort((a, b) => b.r - a.r);
+                col.forEach((cell, idx) => { cell.r = (config.size - 1) - idx; updateCellPosition(cell); });
+            }
+        }
+        function cpuPick() { if (state.isGameOver) return; let p = findPairs(); if (p.length > 0) { state.cpuTarget = p[Math.floor(Math.random()*p.length)][0]; state.cpuTarget.el.classList.add('cpu-hint'); } }
+        function findPairs() { let p = []; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) { if(grid[i].val+grid[j].val===10) p.push([grid[i], grid[j]]); } } return p; }
+        function initKeyboardGame() {
+            const input = document.getElementById('kb-input'); const num1El = document.getElementById('num1'); let n1 = Math.floor(Math.random()*9)+1; num1El.innerText = n1; input.value = ""; input.focus();
+            input.oninput = () => { if (parseInt(input.value) + n1 === 10) { state.score += 50; state.lastTime = Date.now(); updateStatsUI(); n1 = Math.floor(Math.random()*9)+1; num1El.innerText = n1; input.value = ""; } else if (input.value.length >= 1) { state.errors++; updateStatsUI(); input.value = ""; } };
+        }
         function updateStatsUI() {
-            document.getElementById('stat-score').innerText = state.score;
-            document.getElementById('stat-errors').innerText = state.errors;
-            document.getElementById('stat-timer').innerText = state.seconds;
-            
-            const key = `rec_v22_${config.type}_${config.size}`;
-            let high = localStorage.getItem(key) || 0;
-            if (state.score > high) {
-                high = state.score;
-                localStorage.setItem(key, high);
-            }
-            document.getElementById('stat-high').innerText = high;
+            document.getElementById('stat-score').innerText = state.score; document.getElementById('stat-errors').innerText = state.errors; document.getElementById('stat-timer').innerText = state.seconds;
+            const key = `rec_v25_${config.type}_${config.size}`; let high = localStorage.getItem(key) || 0; if (state.score > high) { high = state.score; localStorage.setItem(key, high); } document.getElementById('stat-high').innerText = high;
         }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                state.seconds++;
-                document.getElementById('stat-timer').innerText = state.seconds;
-            }, 1000);
-        }
-
-        function checkGameOver() {
-            if (findPossiblePairs().length === 0) {
-                clearInterval(timerInterval);
-                const isWin = grid.length === 0;
-                document.getElementById('msg').innerHTML = isWin ? "🎉 GEWONNEN! SUPER! 🎉" : "⛔ GEEN ZETTEN MEER! ⛔";
-                return true;
-            }
-            return false;
-        }
-
-        function exitGame() {
-            clearInterval(timerInterval);
-            showScreen('menu-screen');
-        }
+        function startTimer(id) { clearInterval(timerInterval); timerInterval = setInterval(() => { state.seconds++; document.getElementById(id).innerText = state.seconds; }, 1000); }
+        function checkGameOver() { if (grid.length === 0 || findPairs().length === 0) { state.isGameOver = true; clearInterval(timerInterval); document.getElementById('msg').innerHTML = grid.length === 0 ? "🎉 GEWONNEN! 🎉" : "⛔ STOP! ⛔"; document.getElementById('retry-btn').style.display = 'flex'; return true; } return false; }
+        function exitGame() { showScreen('main-mode-screen'); }
+        function restartCurrentLevel() { if (config.type === 3) openKeyboardGame(); else startGridGame(config.size); }
     </script>
 </body>
 </html>
