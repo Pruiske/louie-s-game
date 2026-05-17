@@ -65,12 +65,11 @@
             display: flex; flex-direction: column; align-items: center; box-sizing: border-box;
             position: relative;
         }
-        .sum-row { font-size: clamp(2rem, 10vw, 3.5rem); font-weight: 600; color: var(--primary); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+        .sum-row { font-size: clamp(2.2rem, 10vw, 3.5rem); font-weight: 600; color: var(--primary); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
         
-        /* FIX: Horizontale weergave */
         .work-row { 
             display: flex; flex-direction: row; align-items: center; justify-content: center; 
-            gap: 8px; width: 100%; font-size: clamp(1.2rem, 6vw, 1.8rem); font-weight: 600; 
+            gap: clamp(4px, 2vw, 10px); width: 100%; font-size: clamp(1.4rem, 6vw, 2rem); font-weight: 600; 
         }
         
         .num-input { 
@@ -97,8 +96,6 @@
         #grid-container { position: relative; background: rgba(0,0,0,0.05); border-radius: 12px; border: 4px solid rgba(255,255,255,0.5); }
         .cell { position: absolute; background: white; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.3s; color: var(--primary); box-shadow: 0 3px 0 #dfe6e9; box-sizing: border-box; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
-        
-        /* FIX: Computer kiest kleur */
         .cell.cpu-hint { background: var(--accent) !important; color: #2d3436 !important; border: 3px solid #f39c12 !important; box-shadow: 0 0 10px var(--accent); }
         .cell.exploding { transform: scale(0); opacity: 0; }
 
@@ -109,7 +106,7 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 4.2</div>
+        <div class="version">Versie 4.3</div>
     </div>
 
     <!-- HOOFDMENU -->
@@ -120,7 +117,7 @@
         <button class="btn btn-orange" onclick="navTo('aftrekken-menu')">3️⃣ Aftrekken</button>
     </div>
 
-    <!-- SOM VAN 10 MENU -->
+    <!-- 1. SOM VAN 10 MENU -->
     <div id="som10-grid-menu" class="screen">
         <h2>Spelletjes Som van 10:</h2>
         <button class="btn" onclick="prepareGrid(1)">🧩 Klassiek Raster</button>
@@ -130,7 +127,7 @@
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
-    <!-- SOMMEN MENU -->
+    <!-- 2. SOMMEN MENU -->
     <div id="sommen-menu" class="screen">
         <h2>Oefen optellen:</h2>
         <button class="btn btn-blue" onclick="startSimpleGame('plus_under_10')">🟢 Onder 10</button>
@@ -139,7 +136,7 @@
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
-    <!-- LEVEL MENU 10-20 -->
+    <!-- 2b. SOMMEN 10-20 LEVEL MENU -->
     <div id="plus-10-20-menu" class="screen">
         <h2>Niveau 10 tot 20:</h2>
         <button class="btn btn-blue" onclick="startSimpleGame('plus_10_20_easy')">🟢 Makkelijk (met hulp)</button>
@@ -147,7 +144,7 @@
         <button class="btn btn-back" onclick="navTo('sommen-menu')">Terug</button>
     </div>
 
-    <!-- AFTREKKEN MENU -->
+    <!-- 3. AFTREKKEN MENU -->
     <div id="aftrekken-menu" class="screen">
         <h2>Oefen aftrekken:</h2>
         <button class="btn btn-orange" onclick="startSimpleGame('min_under_10')">🟢 Onder 10</button>
@@ -164,7 +161,7 @@
         <button class="btn btn-back" id="bridge-back-btn">Terug</button>
     </div>
 
-    <!-- RASTER NIVEAU KIEZEN -->
+    <!-- RASTER LEVEL SELECTIE -->
     <div id="level-screen" class="screen">
         <h2>Kies een niveau</h2>
         <button class="btn" onclick="finalizeGridStart(6)">🟢 Makkelijk (6x6)</button>
@@ -173,7 +170,7 @@
         <button class="btn btn-back" onclick="navTo('som10-grid-menu')">Terug</button>
     </div>
 
-    <!-- BRUG GAME SCHERM -->
+    <!-- GAME SCHERMEN -->
     <div id="bridge-game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="bridge-score" class="stat-val">0</span></div>
@@ -182,20 +179,17 @@
             <div class="stat-item">❌ <span id="bridge-errors" class="stat-val">0</span></div>
         </div>
         <div class="game-box">
-            <div class="sum-row"><span id="b-n1"></span><span id="b-op"></span><span id="b-n2" style="color:var(--bridge-color)"></span>=?</div>
+            <div class="sum-row" id="bridge-main-sum"></div>
             <svg class="split-svg" viewBox="0 0 200 60">
                 <line x1="100" y1="5" x2="55" y2="55" class="split-line" />
                 <line x1="100" y1="5" x2="145" y2="55" class="split-line" />
             </svg>
-            <div class="work-row">
-                <span id="c-n1"></span><span id="c-op"></span><div id="s1-container"></div><span id="d-op"></span><div id="s2-container"></div>=<div id="s3-container"></div>
-            </div>
+            <div class="work-row" id="bridge-work-row"></div>
             <div id="bridge-hint" style="margin-top:10px; font-size: 0.9rem; color:#636e72;"></div>
         </div>
         <button class="btn btn-back" onclick="navTo('bridge-selection-menu')">Terug naar varianten</button>
     </div>
 
-    <!-- SIMPLE GAME SCHERM (Keyboard race / Ghost) -->
     <div id="simple-game-screen" class="screen">
         <div id="ghost-element">1</div>
         <div class="stats-wrapper">
@@ -206,17 +200,16 @@
         </div>
         <div class="game-box">
             <div class="sum-row" id="simple-sum-display"></div>
-            <div id="simple-help-area" style="display:none; margin: 15px 0;">
-                Reken eerst: <span id="unit-sum-display"></span> = <input type="number" id="unit-input" class="num-input">
+            <div id="simple-help-area" style="display:none; margin: 15px 0; font-weight: bold;">
+                Reken eerst: <span id="unit-sum-display"></span> = <input type="number" id="unit-input" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
             </div>
             <div id="final-sum-area">
-                <input type="number" id="simple-input" class="num-input" style="width:110px; height:80px; font-size:2rem;" inputmode="numeric">
+                <input type="number" id="simple-input" class="num-input" style="width:110px; height:80px; font-size:2.2rem;" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
             </div>
         </div>
         <button class="btn btn-back" id="simple-back-btn">Terug</button>
     </div>
 
-    <!-- RASTER GAME SCHERM -->
     <div id="game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="stat-score" class="stat-val">0</span></div>
@@ -226,7 +219,7 @@
         </div>
         <div id="grid-container"></div>
         <div id="kb-area" style="display:none; background:white; padding:20px; border-radius:20px; width:100%; text-align:center;">
-            <span id="kb-n1" style="font-size:2.5rem; font-weight:600;"></span> + <input type="number" id="kb-input" class="num-input" style="width:80px; height:70px; font-size:2.5rem;" inputmode="numeric"> = 10
+            <span id="kb-n1" style="font-size:2.5rem; font-weight:600;"></span> + <input type="number" id="kb-input" class="num-input" style="width:80px; height:70px; font-size:2.5rem;" inputmode="numeric" pattern="[0-9]*" autocomplete="off"> = 10
         </div>
         <div id="msg"></div>
         <button id="retry-btn" class="btn" style="display:none; background:var(--secondary); color:white;" onclick="restartGame()">🔄 Opnieuw</button>
@@ -252,7 +245,7 @@
             clearInterval(timerInterval);
         }
 
-        /* --- SIMPLE SUMS --- */
+        /* SIMPLE SUMS (Ghost 1) */
         function startSimpleGame(mode) {
             config.simpleMode = mode;
             state.score = 0; state.seconds = 0; state.correct = 0; state.errors = 0;
@@ -260,7 +253,6 @@
             if(mode.includes('10_20')) backBtn.onclick = () => navTo('plus-10-20-menu');
             else if(mode.startsWith('plus')) backBtn.onclick = () => navTo('sommen-menu');
             else backBtn.onclick = () => navTo('aftrekken-menu');
-
             navTo('simple-game-screen');
             updateSimpleStats(); nextSimpleTask(); startTimer('simple-timer');
         }
@@ -310,7 +302,7 @@
 
         function updateSimpleStats() { document.getElementById('simple-score').innerText = state.score; document.getElementById('simple-correct').innerText = state.correct; document.getElementById('simple-errors').innerText = state.errors; }
 
-        /* --- BRUGMETHODE --- */
+        /* BRUGMETHODE */
         function openBridgeSelection(op) { config.bridgeOp = op; document.getElementById('bridge-back-btn').onclick = () => navTo(op === 'plus' ? 'sommen-menu' : 'aftrekken-menu'); navTo('bridge-selection-menu'); }
         function initBridgeGame(sub) { config.bridgeSubMode = sub; state.score = 0; state.seconds = 0; state.correct = 0; state.errors = 0; navTo('bridge-game-screen'); updateBridgeStats(); nextBridgeTask(); startTimer('bridge-timer'); }
         
@@ -318,11 +310,16 @@
             const op = config.bridgeOp;
             if (op === 'plus') { bData.n1 = Math.floor(Math.random()*4)+6; bData.n2 = Math.floor(Math.random()*4)+5; bData.s1 = 10-bData.n1; bData.s2 = bData.n2-bData.s1; bData.tot = bData.n1+bData.n2; }
             else { bData.n1 = Math.floor(Math.random()*5)+11; bData.s1 = bData.n1-10; bData.tot = Math.floor(Math.random()*5)+5; bData.n2 = bData.n1-bData.tot; bData.s2 = bData.n2-bData.s1; }
-            document.getElementById('b-n1').innerText = bData.n1; document.getElementById('b-op').innerText = op === 'plus' ? '+' : '-'; document.getElementById('b-n2').innerText = bData.n2; document.getElementById('c-n1').innerText = bData.n1; document.getElementById('c-op').innerText = op === 'plus' ? '+' : '-'; document.getElementById('d-op').innerText = op === 'plus' ? '+' : '-';
+            
+            document.getElementById('bridge-main-sum').innerHTML = `<span>${bData.n1}</span><span>${op==='plus'?'+':'-'}</span><span style="color:var(--bridge-color)">${bData.n2}</span><span>=?</span>`;
+            const row = document.getElementById('bridge-work-row');
+            row.innerHTML = `<span>${bData.n1}</span><span>${op==='plus'?'+':'-'}</span><div id="s1-container"></div><span>${op==='plus'?'+':'-'}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
+
             const s1c = document.getElementById('s1-container'); const s2c = document.getElementById('s2-container'); const s3c = document.getElementById('s3-container');
-            s1c.innerHTML = (config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input">';
-            s2c.innerHTML = (config.bridgeSubMode === 'mental' || config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input">';
-            s3c.innerHTML = '<input type="number" id="s3" class="num-input">';
+            s1c.innerHTML = (config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
+            s2c.innerHTML = (config.bridgeSubMode === 'mental' || config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
+            s3c.innerHTML = '<input type="number" id="s3" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
+
             const f3 = document.getElementById('s3'); f3.readOnly = true;
             if (config.bridgeSubMode === 'hard') { document.getElementById('bridge-hint').innerText = "Reken uit..."; f3.readOnly = false; f3.focus(); }
             else {
@@ -333,18 +330,16 @@
         }
         function updateBridgeStats() { document.getElementById('bridge-score').innerText = state.score; document.getElementById('bridge-correct').innerText = state.correct; document.getElementById('bridge-errors').innerText = state.errors; }
 
-        /* --- RASTER GAMES --- */
+        /* RASTER GAMES */
         function prepareGrid(type) { config.type = type; navTo('level-screen'); }
         function finalizeGridStart(size) { config.size = size; startActualGame('grid'); }
         function openKeyboardRace() { config.type = 3; startActualGame('kb'); }
         function startActualGame(ui) {
-            state.score = 0; state.errors = 0; state.seconds = 0; state.lastTime = Date.now();
-            navTo('game-screen'); updateGridStats();
+            state.score = 0; state.errors = 0; state.seconds = 0; state.lastTime = Date.now(); navTo('game-screen'); updateGridStats();
             document.getElementById('grid-container').style.display = ui === 'grid' ? 'block' : 'none';
             document.getElementById('kb-area').style.display = ui === 'kb' ? 'block' : 'none';
             document.getElementById('retry-btn').style.display = 'none'; document.getElementById('msg').innerText = "";
-            if (ui === 'grid') { const w = Math.min(window.innerWidth - 30, 460); initGrid(Math.floor(w / config.size)); } 
-            else { initKeyboard(); }
+            if (ui === 'grid') { const w = Math.min(window.innerWidth - 30, 460); initGrid(Math.floor(w / config.size)); } else { initKeyboard(); }
             startTimer('stat-timer');
         }
         function initGrid(cs) {
@@ -377,10 +372,6 @@
         function initKeyboard() { const inp = document.getElementById('kb-input'); const n1e = document.getElementById('kb-n1'); let n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); inp.oninput = () => { if(parseInt(inp.value) + n1 === 10) { soundCorrect(); state.score += 50; updateGridStats(); n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); } else if(inp.value.length >= 1) { state.errors++; soundError(); updateGridStats(); inp.value = ""; } }; }
         function updateGridStats() { document.getElementById('stat-score').innerText = state.score; document.getElementById('stat-errors').innerText = state.errors; const k = `rec_v4_${config.type}_${config.size}`; let h = localStorage.getItem(k) || 0; if(state.score > h) { h = state.score; localStorage.setItem(k, h); } document.getElementById('stat-high').innerText = h; }
 
-        /* --- GENERIEK --- */
+        /* GENERIEK */
         function startTimer(id) { clearInterval(timerInterval); timerInterval = setInterval(() => { state.seconds++; const el = document.getElementById(id); if(el) el.innerText = state.seconds; }, 1000); }
-        function checkWin() { let p = false; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) p=true; } if(grid.length === 0 || !p) { state.isGameOver = true; clearInterval(timerInterval); document.getElementById('msg').innerText = grid.length === 0 ? "🎉 GEWONNEN!" : "⛔ STOP!"; document.getElementById('retry-btn').style.display = 'flex'; return true; } return false; }
-        function restartGame() { if(config.type === 3) startActualGame('kb'); else startActualGame('grid'); }
-    </script>
-</body>
-</html>
+        function checkWin() { let p = false; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val=
