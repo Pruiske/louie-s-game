@@ -36,8 +36,9 @@
         h1 { margin: 0; font-size: clamp(1.4rem, 5vw, 2.2rem); color: var(--primary); text-shadow: 2px 2px 0px white; }
         .version { font-size: 0.8rem; color: #636e72; font-weight: 600; }
 
+        /* Screen Management */
         .screen { display: none; width: 100%; max-width: 550px; padding: 15px; box-sizing: border-box; flex-direction: column; align-items: center; }
-        .active { display: flex; animation: fadeIn 0.3s ease-out; }
+        .active { display: flex !important; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .stats-wrapper {
@@ -66,9 +67,9 @@
             position: relative;
         }
         
-        /* Dwingt horizontale weergave af voor de brugmethode */
+        /* Layout fix voor brugmethode */
         .sum-row { font-size: clamp(2rem, 9vw, 3.2rem); font-weight: 600; color: var(--primary); margin-bottom: 5px; display: flex; flex-direction: row; align-items: center; gap: 8px; }
-        .work-row { display: flex; flex-direction: row !important; align-items: center; justify-content: center; gap: clamp(4px, 2vw, 10px); width: 100%; font-size: clamp(1.2rem, 5vw, 1.8rem); font-weight: 600; }
+        .work-row { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: clamp(4px, 2vw, 10px); width: 100%; font-size: clamp(1.2rem, 5vw, 1.8rem); font-weight: 600; }
         
         .num-input { 
             width: clamp(45px, 13vw, 62px); height: clamp(45px, 13vw, 62px); 
@@ -83,10 +84,7 @@
         .split-svg { width: 180px; height: 50px; margin: 0; }
         .split-line { stroke: var(--bridge-color); stroke-width: 5; stroke-linecap: round; fill: none; }
 
-        #ghost-element {
-            position: absolute; color: #0984e3; font-weight: bold; font-size: 3rem;
-            pointer-events: none; z-index: 1000; display: none;
-        }
+        #ghost-element { position: absolute; color: #0984e3; font-weight: bold; font-size: 3rem; pointer-events: none; z-index: 1000; display: none; }
         .ten-faded { color: var(--ten-faded); }
         .unit-highlight { color: var(--unit-focus); font-weight: 800; }
         .hidden-step { width: 50px; text-align: center; color: var(--bridge-color); font-weight: bold; font-size: 1.5rem; }
@@ -94,7 +92,8 @@
         #grid-container { position: relative; background: rgba(0,0,0,0.05); border-radius: 12px; border: 4px solid rgba(255,255,255,0.5); margin: 0 auto; }
         .cell { position: absolute; background: white; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.3s; color: var(--primary); box-shadow: 0 3px 0 #dfe6e9; box-sizing: border-box; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
-        .cell.cpu-hint { background: var(--accent) !important; color: #2d3436 !important; border: 3px solid #f39c12 !important; box-shadow: 0 0 12px var(--accent); z-index: 10; }
+        .cell.cpu-hint { background: var(--accent) !important; color: #2d3436 !important; border: 3px solid #f39c12 !important; box-shadow: 0 0 12px var(--accent) !important; z-index: 10; animation: pulse 1s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
         .cell.exploding { transform: scale(0); opacity: 0; }
 
         #msg { height: 40px; margin-top: 10px; font-weight: 600; text-align: center; color: var(--primary); }
@@ -104,36 +103,28 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 4.4</div>
+        <div class="version">Versie 4.7</div>
     </div>
 
     <!-- 0. HOOFDMENU -->
     <div id="main-menu" class="screen active">
-        <h2 style="font-size: 1.2rem;">Maak een keuze:</h2>
-        <button class="btn" onclick="navTo('som10-hub-menu')">1️⃣ Som van 10 & Brug</button>
-        <button class="btn btn-blue" onclick="navTo('sommen-menu')">2️⃣ Sommen (Optellen)</button>
+        <h2 style="font-size: 1.2rem;">Kies een opdracht:</h2>
+        <button class="btn" onclick="navTo('som10-grid-menu')">1️⃣ Som van 10</button>
+        <button class="btn btn-blue" onclick="navTo('sommen-menu')">2️⃣ Optellen</button>
         <button class="btn btn-orange" onclick="navTo('aftrekken-menu')">3️⃣ Aftrekken</button>
     </div>
 
-    <!-- 1. SOM VAN 10 HUB -->
-    <div id="som10-hub-menu" class="screen">
-        <h2>Som van 10:</h2>
-        <button class="btn" onclick="navTo('som10-grid-menu')">🧩 Raster Spelletjes</button>
-        <button class="btn btn-orange" onclick="openBridgeSelection('plus', 'som10-hub-menu')">🔴 Optellen over 10 (Brug)</button>
-        <button class="btn btn-back" onclick="navTo('main-menu')">Terug naar Hoofdmenu</button>
-    </div>
-
-    <!-- 1b. RASTER SELECTIE -->
+    <!-- 1. SOM VAN 10 RASTER MENU -->
     <div id="som10-grid-menu" class="screen">
-        <h2>Kies een rasterspel:</h2>
+        <h2>Spelletjes Som van 10:</h2>
         <button class="btn" onclick="prepareGrid(1)">🧩 Klassiek Raster</button>
         <button class="btn" onclick="prepareGrid(2)">🤖 Computer Kiest</button>
         <button class="btn" onclick="openKeyboardRace()">⌨️ Toetsenbord Race</button>
         <button class="btn" onclick="prepareGrid(4)">🪐 Gravity Mode</button>
-        <button class="btn btn-back" onclick="navTo('som10-hub-menu')">Terug</button>
+        <button class="btn btn-back" onclick="navTo('main-menu')">Terug naar Hoofdmenu</button>
     </div>
 
-    <!-- 2. SOMMEN MENU -->
+    <!-- 2. OPTELLEM MENU -->
     <div id="sommen-menu" class="screen">
         <h2>Oefen optellen:</h2>
         <button class="btn btn-blue" onclick="startSimpleGame('plus_under_10')">🟢 Onder 10</button>
@@ -142,7 +133,7 @@
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
-    <!-- 2b. SOMMEN 10-20 LEVEL MENU -->
+    <!-- 2b. OPTELLEM 10-20 LEVEL MENU -->
     <div id="plus-10-20-menu" class="screen">
         <h2>Niveau 10 tot 20:</h2>
         <button class="btn btn-blue" onclick="startSimpleGame('plus_10_20_easy')">🟢 Makkelijk (met hulp)</button>
@@ -176,7 +167,7 @@
         <button class="btn btn-back" onclick="navTo('som10-grid-menu')">Terug</button>
     </div>
 
-    <!-- SPEL SCHERMEN -->
+    <!-- BRUG GAME SCHERM -->
     <div id="bridge-game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="bridge-score" class="stat-val">0</span></div>
@@ -196,6 +187,7 @@
         <button class="btn btn-back" onclick="navTo('bridge-selection-menu')">Terug naar varianten</button>
     </div>
 
+    <!-- SIMPLE GAME SCHERM (Keyboard race / Ghost) -->
     <div id="simple-game-screen" class="screen">
         <div id="ghost-element">1</div>
         <div class="stats-wrapper">
@@ -216,6 +208,7 @@
         <button class="btn btn-back" id="simple-back-btn">Terug</button>
     </div>
 
+    <!-- RASTER GAME SCHERM -->
     <div id="game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="stat-score" class="stat-val">0</span></div>
@@ -234,30 +227,37 @@
 
     <script>
         let config = { type: 1, size: 8, bridgeSubMode: 'normal', bridgeOp: 'plus', simpleMode: '', lastMenu: 'main-menu' };
-        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, correct: 0, isGameOver: false };
+        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, correct: 0, isGameOver: false, selected: null, cpuTarget: null };
         let bData = {};
         let timerInterval, audioCtx;
 
-        // AUDIO INITIALISATIE
-        function initAudio() { 
-            if(!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } 
-            if(audioCtx.state==='suspended') audioCtx.resume(); 
+        function tryInitAudio() {
+            if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
         }
-        function playSound(f, t, d) { if(!audioCtx) return; try { let o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f, audioCtx.currentTime); o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+d); o.start(); o.stop(audioCtx.currentTime+d); } catch(e){} }
-        function soundCorrect() { playSound(880, 'sine', 0.2); setTimeout(()=>playSound(1109, 'sine', 0.3), 100); }
-        function soundError() { playSound(150, 'sawtooth', 0.4); }
+        function playSound(f, t, d) { if(!audioCtx) return; try { let o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f, audioCtx.currentTime); o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.05, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+d); o.start(); o.stop(audioCtx.currentTime+d); } catch(e){} }
+        function soundCorrect() { playSound(880, 'sine', 0.2); setTimeout(()=>playSound(1109, 'sine', 0.2), 100); }
+        function soundError() { playSound(150, 'sawtooth', 0.3); }
 
-        // NAVIGATIE FIX
         function navTo(id) {
-            initAudio(); // Initialize audio context on first click
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            tryInitAudio();
+            // Verberg alle schermen hard
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => {
+                s.style.display = 'none';
+                s.classList.remove('active');
+            });
+            // Toon doel scherm
             const target = document.getElementById(id);
-            if (target) target.classList.add('active');
+            if (target) {
+                target.style.display = 'flex';
+                target.classList.add('active');
+            }
             clearInterval(timerInterval);
             state.isGameOver = false;
         }
 
-        /* --- SIMPLE GAMES --- */
+        /* --- SIMPLE SUMS (Ghost 1) --- */
         function startSimpleGame(mode) {
             config.simpleMode = mode;
             state.score = 0; state.seconds = 0; state.correct = 0; state.errors = 0;
@@ -275,7 +275,7 @@
             const finalArea = document.getElementById('final-sum-area');
             const sumDisplay = document.getElementById('simple-sum-display');
             const ghost = document.getElementById('ghost-element');
-            helpArea.style.display = "none"; finalArea.style.display = "block"; ghost.style.display = "none"; ghost.style.transition = "none";
+            helpArea.style.display = "none"; finalArea.style.display = "block"; ghost.style.display = "none";
 
             if (config.simpleMode === 'plus_10_20_easy') {
                 n1 = 10 + Math.floor(Math.random() * 8) + 1; n2 = Math.floor(Math.random() * (19 - n1)) + 1; ans = n1 + n2; let u1 = n1 - 10;
@@ -288,7 +288,7 @@
                 if (config.simpleMode === 'plus_under_10') { ans = Math.floor(Math.random()*7)+3; n1 = Math.floor(Math.random()*(ans-1))+1; n2 = ans-n1; }
                 else if (config.simpleMode === 'plus_10_20') { n1 = 10+Math.floor(Math.random()*6); n2 = Math.floor(Math.random()*4)+1; ans = n1+n2; }
                 else if (config.simpleMode === 'min_under_10') { n1 = Math.floor(Math.random()*7)+3; n2 = Math.floor(Math.random()*(n1-1))+1; ans = n1-n2; }
-                sumDisplay.innerHTML = `${n1} ${config.simpleMode.startsWith('plus')?'+':'-'} ${n2} = ?`;
+                sumDisplay.innerHTML = `<span>${n1}</span> <span>${config.simpleMode.startsWith('plus')?'+':'-'}</span> <span>${n2}</span> <span>= ?</span>`;
                 const inp = document.getElementById('simple-input'); inp.value = ""; inp.focus();
                 inp.oninput = () => { if (parseInt(inp.value) === ans) { soundCorrect(); state.score += 20; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= (ans > 9 ? 2 : 1)) { soundError(); state.errors++; updateSimpleStats(); inp.value = ""; } };
             }
@@ -297,7 +297,7 @@
         function animateGhost(finalAns) {
             const ghost = document.getElementById('ghost-element');
             const startRect = document.getElementById('ghost-start').getBoundingClientRect();
-            const inp = document.getElementById('simple-input'); 
+            const inp = document.getElementById('simple-input');
             document.getElementById('final-sum-area').style.display = "block";
             inp.value = "";
             const targetRect = inp.getBoundingClientRect();
@@ -305,27 +305,24 @@
             ghost.style.top = (startRect.top + window.scrollY) + "px"; ghost.style.left = startRect.left + "px";
             void ghost.offsetWidth;
             setTimeout(() => {
-                ghost.style.transition = "all 0.9s cubic-bezier(0.6, -0.28, 0.7, 0.05)";
+                ghost.style.transition = "all 0.8s cubic-bezier(0.6, -0.28, 0.7, 0.05)";
                 ghost.style.top = (targetRect.top + window.scrollY + 10) + "px"; ghost.style.left = (targetRect.left + 15) + "px";
-                setTimeout(() => { soundCorrect(); ghost.style.display = "none"; inp.value = "1"; inp.focus(); inp.oninput = () => { if (parseInt(inp.value) === finalAns) { soundCorrect(); state.score += 30; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= 2) { soundError(); state.errors++; updateSimpleStats(); inp.value = "1"; } }; }, 950);
+                setTimeout(() => { soundCorrect(); ghost.style.display = "none"; inp.value = "1"; inp.focus(); 
+                inp.oninput = () => { if (parseInt(inp.value) === finalAns) { soundCorrect(); state.score += 30; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= 2) { soundError(); state.errors++; updateSimpleStats(); inp.value = "1"; } }; }, 850);
             }, 50);
         }
         function updateSimpleStats() { document.getElementById('simple-score').innerText = state.score; document.getElementById('simple-correct').innerText = state.correct; document.getElementById('simple-errors').innerText = state.errors; }
 
         /* --- BRUGMETHODE --- */
-        function openBridgeSelection(op, fromMenu) { 
-            config.bridgeOp = op; 
-            config.lastMenu = fromMenu;
-            document.getElementById('bridge-back-btn').onclick = () => navTo(config.lastMenu); 
-            navTo('bridge-selection-menu'); 
-        }
+        function openBridgeSelection(op, from) { config.bridgeOp = op; config.lastMenu = from; document.getElementById('bridge-back-btn').onclick = () => navTo(config.lastMenu); navTo('bridge-selection-menu'); }
         function initBridgeGame(sub) { config.bridgeSubMode = sub; state.score = 0; state.seconds = 0; state.correct = 0; state.errors = 0; navTo('bridge-game-screen'); updateBridgeStats(); nextBridgeTask(); startTimer('bridge-timer'); }
         function nextBridgeTask() {
             const op = config.bridgeOp;
             if (op === 'plus') { bData.n1 = Math.floor(Math.random()*4)+6; bData.n2 = Math.floor(Math.random()*4)+5; bData.s1 = 10-bData.n1; bData.s2 = bData.n2-bData.s1; bData.tot = bData.n1+bData.n2; }
             else { bData.n1 = Math.floor(Math.random()*5)+11; bData.s1 = bData.n1-10; bData.tot = Math.floor(Math.random()*5)+5; bData.n2 = bData.n1-bData.tot; bData.s2 = bData.n2-bData.s1; }
-            document.getElementById('bridge-main-sum').innerHTML = `<span>${bData.n1}</span><span>${op==='plus'?'+':'-'}</span><span style="color:var(--bridge-color)">${bData.n2}</span><span>=?</span>`;
-            document.getElementById('bridge-work-row').innerHTML = `<span>${bData.n1}</span><span>${op==='plus'?'+':'-'}</span><div id="s1-container"></div><span>${op==='plus'?'+':'-'}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
+            const operator = op === 'plus' ? '+' : '-';
+            document.getElementById('bridge-main-sum').innerHTML = `<span>${bData.n1}</span><span>${operator}</span><span style="color:var(--bridge-color)">${bData.n2}</span><span>=?</span>`;
+            document.getElementById('bridge-work-row').innerHTML = `<span>${bData.n1}</span><span>${operator}</span><div id="s1-container"></div><span>${operator}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
             const s1c = document.getElementById('s1-container'); const s2c = document.getElementById('s2-container'); const s3c = document.getElementById('s3-container');
             s1c.innerHTML = (config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*">';
             s2c.innerHTML = (config.bridgeSubMode === 'mental' || config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*">';
@@ -380,4 +377,11 @@
         function applyGravity() { for(let c=0; c<config.size; c++) { let col = grid.filter(x => x.c === c).sort((a,b) => b.r - a.r); col.forEach((cell, idx) => { cell.r = (config.size - 1) - idx; cell.el.style.top = (cell.r * cell.cellSize + 2) + 'px'; }); } }
         function cpuPick() { if(state.isGameOver) return; let p = []; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) p.push([grid[i], grid[j]]); } if(p.length > 0) { state.cpuTarget = p[Math.floor(Math.random()*p.length)][0]; state.cpuTarget.el.classList.add('cpu-hint'); } }
         function initKeyboard() { const inp = document.getElementById('kb-input'); const n1e = document.getElementById('kb-n1'); let n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); inp.oninput = () => { if(parseInt(inp.value) + n1 === 10) { soundCorrect(); state.score += 50; updateGridStats(); n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); } else if(inp.value.length >= 1) { state.errors++; soundError(); updateGridStats(); inp.value = ""; } }; }
-        function updateGridStats() { document.getElementById('stat-score').innerText = state.score; document.getElementById('stat-errors').innerText = state.errors; const k = `rec_v4_${config.type}_${config.size}`; let h = localStorage.getItem(k) || 0; if(state.score > h) { h
+        function updateGridStats() { document.getElementById('stat-score').innerText = state.score; document.getElementById('stat-errors').innerText = state.errors; const k = `rec_v4_${config.type}_${config.size}`; let h = localStorage.getItem(k) || 0; if(state.score > h) { h = state.score; localStorage.setItem(k, h); } document.getElementById('stat-high').innerText = h; }
+
+        function startTimer(id) { clearInterval(timerInterval); timerInterval = setInterval(() => { state.seconds++; const el = document.getElementById(id); if(el) el.innerText = state.seconds; }, 1000); }
+        function checkWin() { let p = false; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) p=true; } if(grid.length === 0 || !p) { state.isGameOver = true; clearInterval(timerInterval); document.getElementById('msg').innerText = grid.length === 0 ? "🎉 GEWONNEN!" : "⛔ STOP!"; document.getElementById('retry-btn').style.display = 'flex'; return true; } return false; }
+        function restartGame() { if(config.type === 3) startActualGame('kb'); else startActualGame('grid'); }
+    </script>
+</body>
+</html>
