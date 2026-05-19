@@ -36,7 +36,6 @@
         h1 { margin: 0; font-size: clamp(1.4rem, 5vw, 2.2rem); color: var(--primary); text-shadow: 2px 2px 0px white; }
         .version { font-size: 0.8rem; color: #636e72; font-weight: 600; }
 
-        /* Screen Management */
         .screen { display: none; width: 100%; max-width: 550px; padding: 15px; box-sizing: border-box; flex-direction: column; align-items: center; }
         .active { display: flex !important; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -58,6 +57,7 @@
         .btn:active { transform: scale(0.98); background: #f0f0f0; }
         .btn-orange { color: var(--bridge-color); border: 2px solid var(--bridge-color); }
         .btn-blue { color: #0984e3; border: 2px solid #0984e3; }
+        .btn-mixed { color: #d63031; border: 2px solid #d63031; }
         .btn-back { background: #dfe6e9; color: #636e72; margin-top: 15px; width: auto; min-width: 130px; padding: 10px; }
 
         .game-box { 
@@ -67,9 +67,8 @@
             position: relative;
         }
         
-        /* Layout fix voor brugmethode */
-        .sum-row { font-size: clamp(2rem, 9vw, 3.2rem); font-weight: 600; color: var(--primary); margin-bottom: 5px; display: flex; flex-direction: row; align-items: center; gap: 8px; }
-        .work-row { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: clamp(4px, 2vw, 10px); width: 100%; font-size: clamp(1.2rem, 5vw, 1.8rem); font-weight: 600; }
+        .bridge-sum-row { font-size: clamp(2rem, 9vw, 3.2rem); font-weight: 600; color: var(--primary); margin-bottom: 5px; display: flex; flex-direction: row; align-items: center; gap: 10px; }
+        .bridge-work-row { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 6px; width: 100%; font-size: clamp(1.2rem, 5vw, 2rem); font-weight: 600; }
         
         .num-input { 
             width: clamp(45px, 13vw, 62px); height: clamp(45px, 13vw, 62px); 
@@ -81,7 +80,7 @@
         .num-input.correct { border-color: var(--secondary); background: #e8fffb; color: #00b894; }
         .num-input[readonly] { background-color: #f9f9f9; }
 
-        .split-svg { width: 180px; height: 50px; margin: 0; }
+        .split-svg { width: 180px; height: 50px; }
         .split-line { stroke: var(--bridge-color); stroke-width: 5; stroke-linecap: round; fill: none; }
 
         #ghost-element { position: absolute; color: #0984e3; font-weight: bold; font-size: 3rem; pointer-events: none; z-index: 1000; display: none; }
@@ -90,11 +89,13 @@
         .hidden-step { width: 50px; text-align: center; color: var(--bridge-color); font-weight: bold; font-size: 1.5rem; }
 
         #grid-container { position: relative; background: rgba(0,0,0,0.05); border-radius: 12px; border: 4px solid rgba(255,255,255,0.5); margin: 0 auto; }
-        .cell { position: absolute; background: white; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.3s; color: var(--primary); box-shadow: 0 3px 0 #dfe6e9; box-sizing: border-box; }
+        .cell { position: absolute; background: white; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: top 0.4s, left 0.4s, background 0.3s; color: var(--primary); box-shadow: 0 3px 0 #dfe6e9; box-sizing: border-box; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
-        .cell.cpu-hint { background: var(--accent) !important; color: #2d3436 !important; border: 3px solid #f39c12 !important; box-shadow: 0 0 12px var(--accent) !important; z-index: 10; animation: pulse 1s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .cell.cpu-hint { background: var(--accent) !important; color: #2d3436 !important; border: 3px solid #f39c12 !important; box-shadow: 0 0 15px var(--accent) !important; z-index: 10; animation: cpu-pulse 1s infinite alternate; }
+        @keyframes cpu-pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
         .cell.exploding { transform: scale(0); opacity: 0; }
+
+        #target-sum-display { font-size: 1.8rem; color: #d63031; font-weight: 800; margin-bottom: 10px; background: white; padding: 5px 20px; border-radius: 12px; border: 3px solid #d63031; box-shadow: 0 4px 0 #fad390; }
 
         #msg { height: 40px; margin-top: 10px; font-weight: 600; text-align: center; color: var(--primary); }
     </style>
@@ -103,25 +104,33 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 4.7</div>
+        <div class="version">Versie 5.0</div>
     </div>
 
     <!-- 0. HOOFDMENU -->
     <div id="main-menu" class="screen active">
         <h2 style="font-size: 1.2rem;">Kies een opdracht:</h2>
-        <button class="btn" onclick="navTo('som10-grid-menu')">1️⃣ Som van 10</button>
+        <button class="btn" onclick="navTo('som10-hub-menu')">1️⃣ Som van 10</button>
         <button class="btn btn-blue" onclick="navTo('sommen-menu')">2️⃣ Optellen</button>
         <button class="btn btn-orange" onclick="navTo('aftrekken-menu')">3️⃣ Aftrekken</button>
+        <button class="btn btn-mixed" onclick="navTo('mixed-hub-menu')">4️⃣ Gemengde bewerkingen</button>
     </div>
 
-    <!-- 1. SOM VAN 10 RASTER MENU -->
+    <!-- 1. SOM VAN 10 HUB -->
+    <div id="som10-hub-menu" class="screen">
+        <h2>Som van 10:</h2>
+        <button class="btn" onclick="navTo('som10-grid-menu')">🧩 Raster Spelletjes</button>
+        <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
+    </div>
+
+    <!-- 1b. RASTER SELECTIE -->
     <div id="som10-grid-menu" class="screen">
-        <h2>Spelletjes Som van 10:</h2>
+        <h2>Kies een rasterspel:</h2>
         <button class="btn" onclick="prepareGrid(1)">🧩 Klassiek Raster</button>
         <button class="btn" onclick="prepareGrid(2)">🤖 Computer Kiest</button>
         <button class="btn" onclick="openKeyboardRace()">⌨️ Toetsenbord Race</button>
         <button class="btn" onclick="prepareGrid(4)">🪐 Gravity Mode</button>
-        <button class="btn btn-back" onclick="navTo('main-menu')">Terug naar Hoofdmenu</button>
+        <button class="btn btn-back" onclick="navTo('som10-hub-menu')">Terug</button>
     </div>
 
     <!-- 2. OPTELLEM MENU -->
@@ -133,7 +142,7 @@
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
-    <!-- 2b. OPTELLEM 10-20 LEVEL MENU -->
+    <!-- 2b. 10-20 LEVEL -->
     <div id="plus-10-20-menu" class="screen">
         <h2>Niveau 10 tot 20:</h2>
         <button class="btn btn-blue" onclick="startSimpleGame('plus_10_20_easy')">🟢 Makkelijk (met hulp)</button>
@@ -149,7 +158,15 @@
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
-    <!-- BRUG VARIANT KIEZEN -->
+    <!-- 4. GEMENGD MENU -->
+    <div id="mixed-hub-menu" class="screen">
+        <h2>Gemengde bewerkingen:</h2>
+        <button class="btn btn-mixed" onclick="prepareGrid(5)">🪐 Gravityspel (Gemengd)</button>
+        <button class="btn btn-mixed" onclick="openBridgeSelection('mixed', 'mixed-hub-menu')">🌉 Optellen én aftrekken (Brug)</button>
+        <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
+    </div>
+
+    <!-- BRUG VARIANT MENU -->
     <div id="bridge-selection-menu" class="screen">
         <h2>Kies een variant:</h2>
         <button class="btn btn-orange" onclick="initBridgeGame('normal')">📝 Stap voor Stap</button>
@@ -158,16 +175,16 @@
         <button class="btn btn-back" id="bridge-back-btn">Terug</button>
     </div>
 
-    <!-- RASTER LEVEL SELECTIE -->
+    <!-- RASTER LEVEL MENU -->
     <div id="level-screen" class="screen">
         <h2 id="level-title">Kies een niveau:</h2>
         <button class="btn" onclick="finalizeGridStart(6)">🟢 Makkelijk (6x6)</button>
         <button class="btn" onclick="finalizeGridStart(8)">🟡 Gemiddeld (8x8)</button>
         <button class="btn" onclick="finalizeGridStart(10)">🔴 Moeilijk (10x10)</button>
-        <button class="btn btn-back" onclick="navTo('som10-grid-menu')">Terug</button>
+        <button class="btn btn-back" id="level-back-btn">Terug</button>
     </div>
 
-    <!-- BRUG GAME SCHERM -->
+    <!-- GAMES -->
     <div id="bridge-game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="bridge-score" class="stat-val">0</span></div>
@@ -176,18 +193,17 @@
             <div class="stat-item">❌ <span id="bridge-errors" class="stat-val">0</span></div>
         </div>
         <div class="game-box">
-            <div class="sum-row" id="bridge-main-sum"></div>
+            <div id="bridge-main-sum" class="bridge-sum-row"></div>
             <svg class="split-svg" viewBox="0 0 200 60">
                 <line x1="100" y1="5" x2="55" y2="55" class="split-line" />
                 <line x1="100" y1="5" x2="145" y2="55" class="split-line" />
             </svg>
-            <div class="work-row" id="bridge-work-row"></div>
+            <div id="bridge-work-row" class="bridge-work-row"></div>
             <div id="bridge-hint" style="margin-top:10px; font-size: 0.9rem; color:#636e72;"></div>
         </div>
-        <button class="btn btn-back" onclick="navTo('bridge-selection-menu')">Terug naar varianten</button>
+        <button class="btn btn-back" onclick="navTo('bridge-selection-menu')">Terug</button>
     </div>
 
-    <!-- SIMPLE GAME SCHERM (Keyboard race / Ghost) -->
     <div id="simple-game-screen" class="screen">
         <div id="ghost-element">1</div>
         <div class="stats-wrapper">
@@ -208,7 +224,6 @@
         <button class="btn btn-back" id="simple-back-btn">Terug</button>
     </div>
 
-    <!-- RASTER GAME SCHERM -->
     <div id="game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="stat-score" class="stat-val">0</span></div>
@@ -216,116 +231,48 @@
             <div class="stat-item">❌ <span id="stat-errors" class="stat-val">0</span></div>
             <div class="stat-item">🏆 <span id="stat-high" class="stat-val">0</span></div>
         </div>
+        <div id="target-sum-display" style="display:none;">Maak som: ?</div>
         <div id="grid-container"></div>
         <div id="kb-area" style="display:none; background:white; padding:20px; border-radius:20px; width:100%; text-align:center;">
             <span id="kb-n1" style="font-size:2.5rem; font-weight:600;"></span> + <input type="number" id="kb-input" class="num-input" style="width:80px; height:70px; font-size:2.5rem;" inputmode="numeric" pattern="[0-9]*"> = 10
         </div>
         <div id="msg"></div>
         <button id="retry-btn" class="btn" style="display:none; background:var(--secondary); color:white;" onclick="restartGame()">🔄 Opnieuw</button>
-        <button class="btn btn-back" onclick="navTo('som10-grid-menu')">Terug</button>
+        <button class="btn btn-back" id="grid-back-btn">Terug</button>
     </div>
 
     <script>
         let config = { type: 1, size: 8, bridgeSubMode: 'normal', bridgeOp: 'plus', simpleMode: '', lastMenu: 'main-menu' };
-        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, correct: 0, isGameOver: false, selected: null, cpuTarget: null };
+        let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, correct: 0, isGameOver: false, selected: null, cpuTarget: null, targetSum: 10 };
         let bData = {};
         let timerInterval, audioCtx;
 
-        function tryInitAudio() {
-            if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-        }
+        function initAudio() { if(!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); }
         function playSound(f, t, d) { if(!audioCtx) return; try { let o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=t; o.frequency.setValueAtTime(f, audioCtx.currentTime); o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.05, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime+d); o.start(); o.stop(audioCtx.currentTime+d); } catch(e){} }
         function soundCorrect() { playSound(880, 'sine', 0.2); setTimeout(()=>playSound(1109, 'sine', 0.2), 100); }
         function soundError() { playSound(150, 'sawtooth', 0.3); }
 
         function navTo(id) {
-            tryInitAudio();
-            // Verberg alle schermen hard
-            const screens = document.querySelectorAll('.screen');
-            screens.forEach(s => {
-                s.style.display = 'none';
-                s.classList.remove('active');
-            });
-            // Toon doel scherm
+            initAudio();
+            document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; s.classList.remove('active'); });
             const target = document.getElementById(id);
-            if (target) {
-                target.style.display = 'flex';
-                target.classList.add('active');
-            }
+            if(target) { target.style.display = 'flex'; target.classList.add('active'); }
             clearInterval(timerInterval);
-            state.isGameOver = false;
         }
 
-        /* --- SIMPLE SUMS (Ghost 1) --- */
-        function startSimpleGame(mode) {
-            config.simpleMode = mode;
-            state.score = 0; state.seconds = 0; state.correct = 0; state.errors = 0;
-            const backBtn = document.getElementById('simple-back-btn');
-            if(mode.includes('10_20')) backBtn.onclick = () => navTo('plus-10-20-menu');
-            else if(mode.startsWith('plus')) backBtn.onclick = () => navTo('sommen-menu');
-            else backBtn.onclick = () => navTo('aftrekken-menu');
-            navTo('simple-game-screen');
-            updateSimpleStats(); nextSimpleTask(); startTimer('simple-timer');
-        }
-
-        function nextSimpleTask() {
-            let n1, n2, ans;
-            const helpArea = document.getElementById('simple-help-area');
-            const finalArea = document.getElementById('final-sum-area');
-            const sumDisplay = document.getElementById('simple-sum-display');
-            const ghost = document.getElementById('ghost-element');
-            helpArea.style.display = "none"; finalArea.style.display = "block"; ghost.style.display = "none";
-
-            if (config.simpleMode === 'plus_10_20_easy') {
-                n1 = 10 + Math.floor(Math.random() * 8) + 1; n2 = Math.floor(Math.random() * (19 - n1)) + 1; ans = n1 + n2; let u1 = n1 - 10;
-                sumDisplay.innerHTML = `<span id="ghost-start" class="ten-faded">1</span><span class="unit-highlight">${u1}</span> + <span class="unit-highlight">${n2}</span> = ?`;
-                helpArea.style.display = "block"; finalArea.style.display = "none";
-                document.getElementById('unit-sum-display').innerHTML = `<span class="unit-highlight">${u1} + ${n2}</span>`;
-                const uInp = document.getElementById('unit-input'); uInp.value = ""; uInp.readOnly = false; uInp.focus();
-                uInp.oninput = () => { if (parseInt(uInp.value) === (u1 + n2)) { soundCorrect(); uInp.readOnly = true; animateGhost(ans); } else if (uInp.value.length >= 1) { soundError(); state.errors++; updateSimpleStats(); uInp.value = ""; } };
-            } else {
-                if (config.simpleMode === 'plus_under_10') { ans = Math.floor(Math.random()*7)+3; n1 = Math.floor(Math.random()*(ans-1))+1; n2 = ans-n1; }
-                else if (config.simpleMode === 'plus_10_20') { n1 = 10+Math.floor(Math.random()*6); n2 = Math.floor(Math.random()*4)+1; ans = n1+n2; }
-                else if (config.simpleMode === 'min_under_10') { n1 = Math.floor(Math.random()*7)+3; n2 = Math.floor(Math.random()*(n1-1))+1; ans = n1-n2; }
-                sumDisplay.innerHTML = `<span>${n1}</span> <span>${config.simpleMode.startsWith('plus')?'+':'-'}</span> <span>${n2}</span> <span>= ?</span>`;
-                const inp = document.getElementById('simple-input'); inp.value = ""; inp.focus();
-                inp.oninput = () => { if (parseInt(inp.value) === ans) { soundCorrect(); state.score += 20; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= (ans > 9 ? 2 : 1)) { soundError(); state.errors++; updateSimpleStats(); inp.value = ""; } };
-            }
-        }
-
-        function animateGhost(finalAns) {
-            const ghost = document.getElementById('ghost-element');
-            const startRect = document.getElementById('ghost-start').getBoundingClientRect();
-            const inp = document.getElementById('simple-input');
-            document.getElementById('final-sum-area').style.display = "block";
-            inp.value = "";
-            const targetRect = inp.getBoundingClientRect();
-            ghost.style.transition = "none"; ghost.style.display = "block";
-            ghost.style.top = (startRect.top + window.scrollY) + "px"; ghost.style.left = startRect.left + "px";
-            void ghost.offsetWidth;
-            setTimeout(() => {
-                ghost.style.transition = "all 0.8s cubic-bezier(0.6, -0.28, 0.7, 0.05)";
-                ghost.style.top = (targetRect.top + window.scrollY + 10) + "px"; ghost.style.left = (targetRect.left + 15) + "px";
-                setTimeout(() => { soundCorrect(); ghost.style.display = "none"; inp.value = "1"; inp.focus(); 
-                inp.oninput = () => { if (parseInt(inp.value) === finalAns) { soundCorrect(); state.score += 30; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= 2) { soundError(); state.errors++; updateSimpleStats(); inp.value = "1"; } }; }, 850);
-            }, 50);
-        }
-        function updateSimpleStats() { document.getElementById('simple-score').innerText = state.score; document.getElementById('simple-correct').innerText = state.correct; document.getElementById('simple-errors').innerText = state.errors; }
-
-        /* --- BRUGMETHODE --- */
+        /* BRUGMETHODE */
         function openBridgeSelection(op, from) { config.bridgeOp = op; config.lastMenu = from; document.getElementById('bridge-back-btn').onclick = () => navTo(config.lastMenu); navTo('bridge-selection-menu'); }
-        function initBridgeGame(sub) { config.bridgeSubMode = sub; state.score = 0; state.seconds = 0; state.correct = 0; state.errors = 0; navTo('bridge-game-screen'); updateBridgeStats(); nextBridgeTask(); startTimer('bridge-timer'); }
+        function initBridgeGame(sub) { config.bridgeSubMode = sub; state.score=0; state.seconds=0; state.correct=0; state.errors=0; navTo('bridge-game-screen'); updateBridgeStats(); nextBridgeTask(); startTimer('bridge-timer'); }
         function nextBridgeTask() {
-            const op = config.bridgeOp;
+            let op = config.bridgeOp; if(op === 'mixed') op = Math.random() > 0.5 ? 'plus' : 'min';
             if (op === 'plus') { bData.n1 = Math.floor(Math.random()*4)+6; bData.n2 = Math.floor(Math.random()*4)+5; bData.s1 = 10-bData.n1; bData.s2 = bData.n2-bData.s1; bData.tot = bData.n1+bData.n2; }
             else { bData.n1 = Math.floor(Math.random()*5)+11; bData.s1 = bData.n1-10; bData.tot = Math.floor(Math.random()*5)+5; bData.n2 = bData.n1-bData.tot; bData.s2 = bData.n2-bData.s1; }
-            const operator = op === 'plus' ? '+' : '-';
-            document.getElementById('bridge-main-sum').innerHTML = `<span>${bData.n1}</span><span>${operator}</span><span style="color:var(--bridge-color)">${bData.n2}</span><span>=?</span>`;
-            document.getElementById('bridge-work-row').innerHTML = `<span>${bData.n1}</span><span>${operator}</span><div id="s1-container"></div><span>${operator}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
-            const s1c = document.getElementById('s1-container'); const s2c = document.getElementById('s2-container'); const s3c = document.getElementById('s3-container');
-            s1c.innerHTML = (config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*">';
-            s2c.innerHTML = (config.bridgeSubMode === 'mental' || config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*">';
+            const oper = (op==='plus'?'+':'-');
+            document.getElementById('bridge-main-sum').innerHTML = `<span>${bData.n1}</span><span>${oper}</span><span style="color:var(--bridge-color)">${bData.n2}</span><span>=?</span>`;
+            document.getElementById('bridge-work-row').innerHTML = `<span>${bData.n1}</span><span>${oper}</span><div id="s1-container"></div><span>${oper}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
+            const s1c = document.getElementById('s1-container'), s2c = document.getElementById('s2-container'), s3c = document.getElementById('s3-container');
+            s1c.innerHTML = (config.bridgeSubMode==='hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*">';
+            s2c.innerHTML = (config.bridgeSubMode==='mental'||config.bridgeSubMode==='hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*">';
             s3c.innerHTML = '<input type="number" id="s3" class="num-input" inputmode="numeric" pattern="[0-9]*">';
             const f3 = document.getElementById('s3'); f3.readOnly = true;
             if (config.bridgeSubMode === 'hard') { document.getElementById('bridge-hint').innerText = "Reken uit..."; f3.readOnly = false; f3.focus(); }
@@ -337,50 +284,104 @@
         }
         function updateBridgeStats() { document.getElementById('bridge-score').innerText = state.score; document.getElementById('bridge-correct').innerText = state.correct; document.getElementById('bridge-errors').innerText = state.errors; }
 
-        /* --- RASTER GAMES --- */
-        function prepareGrid(type) { config.type = type; navTo('level-screen'); }
+        /* RASTER LOGICA */
+        function prepareGrid(type) { config.type = type; document.getElementById('level-back-btn').onclick = () => navTo(type===5?'mixed-hub-menu':'som10-grid-menu'); navTo('level-screen'); }
         function finalizeGridStart(size) { config.size = size; startActualGame('grid'); }
         function openKeyboardRace() { config.type = 3; startActualGame('kb'); }
         function startActualGame(ui) {
-            state.score = 0; state.errors = 0; state.seconds = 0; state.lastTime = Date.now(); navTo('game-screen'); updateGridStats();
-            document.getElementById('grid-container').style.display = ui === 'grid' ? 'block' : 'none';
-            document.getElementById('kb-area').style.display = ui === 'kb' ? 'block' : 'none';
-            document.getElementById('retry-btn').style.display = 'none'; document.getElementById('msg').innerText = "";
-            if (ui === 'grid') { const w = Math.min(window.innerWidth - 30, 460); initGrid(Math.floor(w / config.size)); } else { initKeyboard(); }
-            startTimer('stat-timer');
+            state.score=0; state.errors=0; state.seconds=0; state.lastTime=Date.now(); navTo('game-screen');
+            document.getElementById('grid-container').style.display = ui==='grid'?'block':'none';
+            document.getElementById('kb-area').style.display = ui==='kb'?'block':'none';
+            document.getElementById('target-sum-display').style.display = (config.type===5)?'block':'none';
+            document.getElementById('grid-back-btn').onclick = () => navTo(config.type===5?'mixed-hub-menu':'som10-grid-menu');
+            if (ui === 'grid') { initGrid(Math.floor(Math.min(window.innerWidth-30, 460)/config.size)); } else initKeyboard();
+            startTimer('stat-timer'); updateGridStats();
         }
         function initGrid(cs) {
-            const container = document.getElementById('grid-container'); container.innerHTML = '';
-            container.style.width = (config.size * cs) + 'px'; container.style.height = (config.size * cs) + 'px';
-            grid = []; let vals = []; for (let i=0; i<(config.size*config.size)/2; i++) { let v = Math.floor(Math.random()*9)+1; vals.push(v, 10-v); }
-            vals.sort(() => Math.random() - 0.5);
+            const container = document.getElementById('grid-container'); container.innerHTML = ''; container.style.width = (config.size * cs) + 'px'; container.style.height = (config.size * cs) + 'px';
+            grid = []; let vals = []; 
+            for (let i=0; i<(config.size*config.size)/2; i++) {
+                let v1 = Math.floor(Math.random()*9)+1, v2 = (config.type===5)?Math.floor(Math.random()*9)+1:(10-v1);
+                vals.push(v1, v2);
+            }
+            vals.sort(()=>Math.random()-0.5);
             for (let r=0; r<config.size; r++) {
                 for (let c=0; c<config.size; c++) {
-                    const val = vals[r*config.size + c]; const el = document.createElement('div'); el.className = 'cell'; el.innerText = val;
+                    const val = vals[r*config.size+c], el = document.createElement('div'); el.className = 'cell'; el.innerText = val;
                     el.style.width = (cs-4)+'px'; el.style.height = (cs-4)+'px'; el.style.top = (r*cs+2)+'px'; el.style.left = (c*cs+2)+'px';
                     const obj = { r, c, val, el, cellSize: cs }; el.onclick = () => onCellClick(obj); container.appendChild(el); grid.push(obj);
                 }
             }
-            if (config.type === 2) setTimeout(cpuPick, 600);
+            if (config.type === 2 || config.type === 5) setTimeout(cpuPick, 600);
         }
+        
         function onCellClick(obj) {
             if(state.isGameOver) return;
-            if(config.type === 2) { if(state.cpuTarget && obj.val + state.cpuTarget.val === 10 && obj !== state.cpuTarget) { removePair(obj, state.cpuTarget); state.cpuTarget = null; if(!checkWin()) setTimeout(cpuPick, 500); } else { state.errors++; soundError(); updateGridStats(); } return; }
+            // CPU MODE (2 en 5)
+            if(config.type === 2 || config.type === 5) { 
+                const target = (config.type===5)?state.targetSum:10;
+                if(state.cpuTarget && obj.val + state.cpuTarget.val === target && obj !== state.cpuTarget){ 
+                    removePair(obj, state.cpuTarget); state.cpuTarget=null; if(!checkWin()) setTimeout(cpuPick, 500); 
+                } else { state.errors++; soundError(); updateGridStats(); } 
+                return; 
+            }
+            // REGULAR MODE
             if(!state.selected) { state.selected = obj; obj.el.classList.add('selected'); }
-            else { if(state.selected === obj) { obj.el.classList.remove('selected'); state.selected = null; } else if(state.selected.val + obj.val === 10) { removePair(state.selected, obj); state.selected = null; checkWin(); } else { state.errors++; soundError(); updateGridStats(); state.selected.el.classList.remove('selected'); state.selected = null; } }
+            else {
+                if(state.selected===obj) { obj.el.classList.remove('selected'); state.selected=null; }
+                else if(state.selected.val + obj.val === 10) { removePair(state.selected, obj); state.selected=null; checkWin(); } 
+                else { state.errors++; soundError(); updateGridStats(); state.selected.el.classList.remove('selected'); state.selected=null; }
+            }
         }
-        function removePair(c1, c2) {
-            soundCorrect(); const now = Date.now(); state.score += Math.max(10, Math.floor(100 - ((now - state.lastTime)/1000)*8));
-            state.lastTime = now; updateGridStats(); c1.el.classList.add('exploding'); c2.el.classList.add('exploding');
-            setTimeout(() => { c1.el.remove(); c2.el.remove(); grid = grid.filter(c => c !== c1 && c !== c2); if(config.type === 4) applyGravity(); checkWin(); }, 300);
-        }
+        function removePair(c1, c2) { soundCorrect(); state.score += Math.max(10, Math.floor(100 - ((Date.now()-state.lastTime)/1000)*8)); state.lastTime = Date.now(); updateGridStats(); c1.el.classList.add('exploding'); c2.el.classList.add('exploding'); setTimeout(() => { c1.el.remove(); c2.el.remove(); grid = grid.filter(c => c !== c1 && c !== c2); if(config.type>=4) applyGravity(); checkWin(); }, 300); }
         function applyGravity() { for(let c=0; c<config.size; c++) { let col = grid.filter(x => x.c === c).sort((a,b) => b.r - a.r); col.forEach((cell, idx) => { cell.r = (config.size - 1) - idx; cell.el.style.top = (cell.r * cell.cellSize + 2) + 'px'; }); } }
-        function cpuPick() { if(state.isGameOver) return; let p = []; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) p.push([grid[i], grid[j]]); } if(p.length > 0) { state.cpuTarget = p[Math.floor(Math.random()*p.length)][0]; state.cpuTarget.el.classList.add('cpu-hint'); } }
-        function initKeyboard() { const inp = document.getElementById('kb-input'); const n1e = document.getElementById('kb-n1'); let n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); inp.oninput = () => { if(parseInt(inp.value) + n1 === 10) { soundCorrect(); state.score += 50; updateGridStats(); n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); } else if(inp.value.length >= 1) { state.errors++; soundError(); updateGridStats(); inp.value = ""; } }; }
-        function updateGridStats() { document.getElementById('stat-score').innerText = state.score; document.getElementById('stat-errors').innerText = state.errors; const k = `rec_v4_${config.type}_${config.size}`; let h = localStorage.getItem(k) || 0; if(state.score > h) { h = state.score; localStorage.setItem(k, h); } document.getElementById('stat-high').innerText = h; }
+        
+        function cpuPick() { 
+            if(state.isGameOver) return; 
+            let p = []; 
+            if(config.type === 5) {
+                // Find valid pairs for mixed mode
+                for(let i=0; i<grid.length; i++) {
+                    for(let j=i+1; j<grid.length; j++) p.push([grid[i], grid[j]]);
+                }
+            } else {
+                for(let i=0; i<grid.length; i++) {
+                    for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) p.push([grid[i], grid[j]]);
+                }
+            }
+            if(p.length > 0) { 
+                let randomPair = p[Math.floor(Math.random()*p.length)];
+                state.cpuTarget = randomPair[0];
+                if(config.type === 5) {
+                    state.targetSum = state.cpuTarget.val + randomPair[1].val;
+                    document.getElementById('target-sum-display').innerText = `Maak som: ${state.targetSum}`;
+                }
+                state.cpuTarget.el.classList.add('cpu-hint'); 
+            } 
+        }
+        
+        function initKeyboard() { const inp = document.getElementById('kb-input'), n1e = document.getElementById('kb-n1'); let n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); inp.oninput = () => { if(parseInt(inp.value)+n1===10) { soundCorrect(); state.score+=50; updateGridStats(); n1=Math.floor(Math.random()*9)+1; n1e.innerText=n1; inp.value=""; inp.focus(); } else if(inp.value.length>=1){ state.errors++; soundError(); updateGridStats(); inp.value=""; } }; }
+        function updateGridStats() { document.getElementById('stat-score').innerText = state.score; document.getElementById('stat-errors').innerText = state.errors; const k = `rec_v5_${config.type}_${config.size}`; let h = localStorage.getItem(k) || 0; if(state.score > h) { h = state.score; localStorage.setItem(k, h); } document.getElementById('stat-high').innerText = h; }
+
+        /* SIMPLE SUMS */
+        function startSimpleGame(mode) { config.simpleMode = mode; state.score=0; state.seconds=0; state.correct=0; state.errors=0; const backBtn = document.getElementById('simple-back-btn'); if(mode.includes('10_20')) backBtn.onclick = () => navTo('plus-10-20-menu'); else if(mode.startsWith('plus')) backBtn.onclick = () => navTo('sommen-menu'); else backBtn.onclick = () => navTo('aftrekken-menu'); navTo('simple-game-screen'); updateSimpleStats(); nextSimpleTask(); startTimer('simple-timer'); }
+        function nextSimpleTask() {
+            let n1, n2, ans; const helpArea = document.getElementById('simple-help-area'), finalArea = document.getElementById('final-sum-area'), sumDisplay = document.getElementById('simple-sum-display'), ghost = document.getElementById('ghost-element');
+            helpArea.style.display="none"; finalArea.style.display="block"; ghost.style.display="none";
+            if (config.simpleMode === 'plus_10_20_easy') { n1 = 10 + Math.floor(Math.random() * 8) + 1; n2 = Math.floor(Math.random() * (19 - n1)) + 1; ans = n1 + n2; let u1 = n1 - 10; sumDisplay.innerHTML = `<span id="ghost-start" class="ten-faded">1</span><span class="unit-highlight">${u1}</span> + <span class="unit-highlight">${n2}</span> = ?`; helpArea.style.display="block"; finalArea.style.display="none"; document.getElementById('unit-sum-display').innerHTML = `<span class="unit-highlight">${u1} + ${n2}</span>`; const uInp = document.getElementById('unit-input'); uInp.value=""; uInp.readOnly=false; uInp.focus(); uInp.oninput = () => { if (parseInt(uInp.value) === (u1 + n2)) { soundCorrect(); uInp.readOnly=true; animateGhost(ans); } else if (uInp.value.length >= 1) { soundError(); state.errors++; updateSimpleStats(); uInp.value=""; } }; } 
+            else { if (config.simpleMode === 'plus_under_10') { ans = Math.floor(Math.random()*7)+3; n1 = Math.floor(Math.random()*(ans-1))+1; n2 = ans-n1; } else if (config.simpleMode === 'plus_10_20') { n1 = 10+Math.floor(Math.random()*6); n2 = Math.floor(Math.random()*4)+1; ans = n1+n2; } else if (config.simpleMode === 'min_under_10') { n1 = Math.floor(Math.random()*7)+3; n2 = Math.floor(Math.random()*(n1-1))+1; ans = n1-n2; }
+            sumDisplay.innerHTML = `<span>${n1}</span> <span>${config.simpleMode.startsWith('plus')?'+':'-'}</span> <span>${n2}</span> <span>= ?</span>`; const inp = document.getElementById('simple-input'); inp.value=""; inp.focus(); inp.oninput = () => { if (parseInt(inp.value) === ans) { soundCorrect(); state.score+=20; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= (ans>9?2:1)) { soundError(); state.errors++; updateSimpleStats(); inp.value=""; } }; }
+        }
+        function animateGhost(finalAns) {
+            const ghost = document.getElementById('ghost-element'), startRect = document.getElementById('ghost-start').getBoundingClientRect(), inp = document.getElementById('simple-input');
+            document.getElementById('final-sum-area').style.display="block"; inp.value=""; const targetRect = inp.getBoundingClientRect();
+            ghost.style.transition="none"; ghost.style.display="block"; ghost.style.top = (startRect.top + window.scrollY) + "px"; ghost.style.left = startRect.left + "px"; void ghost.offsetWidth;
+            setTimeout(() => { ghost.style.transition = "all 0.8s cubic-bezier(0.6, -0.28, 0.7, 0.05)"; ghost.style.top = (targetRect.top + window.scrollY + 10) + "px"; ghost.style.left = (targetRect.left + 15) + "px"; setTimeout(() => { soundCorrect(); ghost.style.display="none"; inp.value="1"; inp.focus(); inp.oninput = () => { if (parseInt(inp.value) === finalAns) { soundCorrect(); state.score+=30; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= 2) { soundError(); state.errors++; updateSimpleStats(); inp.value="1"; } }; }, 850); }, 50);
+        }
+        function updateSimpleStats() { document.getElementById('simple-score').innerText = state.score; document.getElementById('simple-correct').innerText = state.correct; document.getElementById('simple-errors').innerText = state.errors; }
 
         function startTimer(id) { clearInterval(timerInterval); timerInterval = setInterval(() => { state.seconds++; const el = document.getElementById(id); if(el) el.innerText = state.seconds; }, 1000); }
-        function checkWin() { let p = false; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) p=true; } if(grid.length === 0 || !p) { state.isGameOver = true; clearInterval(timerInterval); document.getElementById('msg').innerText = grid.length === 0 ? "🎉 GEWONNEN!" : "⛔ STOP!"; document.getElementById('retry-btn').style.display = 'flex'; return true; } return false; }
+        function checkWin() { let p = false; const target = (config.type===5)?state.targetSum:10; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===target) p=true; } if(grid.length === 0 || !p) { state.isGameOver=true; clearInterval(timerInterval); document.getElementById('msg').innerText = grid.length===0?"🎉 GEWONNEN!":"⛔ STOP!"; document.getElementById('retry-btn').style.display='flex'; return true; } return false; }
         function restartGame() { if(config.type === 3) startActualGame('kb'); else startActualGame('grid'); }
     </script>
 </body>
