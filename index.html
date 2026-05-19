@@ -32,7 +32,7 @@
             touch-action: manipulation;
         }
 
-        .header-container { text-align: center; margin: 15px 0; width: 100%; }
+        .header-container { text-align: center; margin: 10px 0; width: 100%; }
         h1 { margin: 0; font-size: clamp(1.4rem, 5vw, 2.2rem); color: var(--primary); text-shadow: 2px 2px 0px white; }
         .version { font-size: 0.8rem; color: #636e72; font-weight: 600; }
 
@@ -86,7 +86,6 @@
         #ghost-element { position: absolute; color: #0984e3; font-weight: bold; font-size: 3rem; pointer-events: none; z-index: 1000; display: none; }
         .ten-faded { color: var(--ten-faded); }
         .unit-highlight { color: var(--unit-focus); font-weight: 800; }
-        .hidden-step { width: 50px; text-align: center; color: var(--bridge-color); font-weight: bold; font-size: 1.5rem; }
 
         #grid-container { position: relative; background: rgba(0,0,0,0.05); border-radius: 12px; border: 4px solid rgba(255,255,255,0.5); margin: 0 auto; }
         .cell { position: absolute; background: white; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: top 0.4s, left 0.4s, background 0.3s; color: var(--primary); box-shadow: 0 3px 0 #dfe6e9; box-sizing: border-box; }
@@ -104,7 +103,7 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 5.0</div>
+        <div class="version">Versie 5.1</div>
     </div>
 
     <!-- 0. HOOFDMENU -->
@@ -123,7 +122,7 @@
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
-    <!-- 1b. RASTER SELECTIE -->
+    <!-- 1b. RASTER MENU -->
     <div id="som10-grid-menu" class="screen">
         <h2>Kies een rasterspel:</h2>
         <button class="btn" onclick="prepareGrid(1)">🧩 Klassiek Raster</button>
@@ -142,7 +141,7 @@
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
-    <!-- 2b. 10-20 LEVEL -->
+    <!-- 2b. OPTELLEM 10-20 MENU -->
     <div id="plus-10-20-menu" class="screen">
         <h2>Niveau 10 tot 20:</h2>
         <button class="btn btn-blue" onclick="startSimpleGame('plus_10_20_easy')">🟢 Makkelijk (met hulp)</button>
@@ -254,7 +253,8 @@
 
         function navTo(id) {
             initAudio();
-            document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; s.classList.remove('active'); });
+            const screens = document.querySelectorAll('.screen');
+            for(let s of screens) { s.style.display = 'none'; s.classList.remove('active'); }
             const target = document.getElementById(id);
             if(target) { target.style.display = 'flex'; target.classList.add('active'); }
             clearInterval(timerInterval);
@@ -271,9 +271,9 @@
             document.getElementById('bridge-main-sum').innerHTML = `<span>${bData.n1}</span><span>${oper}</span><span style="color:var(--bridge-color)">${bData.n2}</span><span>=?</span>`;
             document.getElementById('bridge-work-row').innerHTML = `<span>${bData.n1}</span><span>${oper}</span><div id="s1-container"></div><span>${oper}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
             const s1c = document.getElementById('s1-container'), s2c = document.getElementById('s2-container'), s3c = document.getElementById('s3-container');
-            s1c.innerHTML = (config.bridgeSubMode==='hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*">';
-            s2c.innerHTML = (config.bridgeSubMode==='mental'||config.bridgeSubMode==='hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*">';
-            s3c.innerHTML = '<input type="number" id="s3" class="num-input" inputmode="numeric" pattern="[0-9]*">';
+            s1c.innerHTML = (config.bridgeSubMode==='hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric">';
+            s2c.innerHTML = (config.bridgeSubMode==='mental'||config.bridgeSubMode==='hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric">';
+            s3c.innerHTML = '<input type="number" id="s3" class="num-input" inputmode="numeric">';
             const f3 = document.getElementById('s3'); f3.readOnly = true;
             if (config.bridgeSubMode === 'hard') { document.getElementById('bridge-hint').innerText = "Reken uit..."; f3.readOnly = false; f3.focus(); }
             else {
@@ -289,22 +289,19 @@
         function finalizeGridStart(size) { config.size = size; startActualGame('grid'); }
         function openKeyboardRace() { config.type = 3; startActualGame('kb'); }
         function startActualGame(ui) {
-            state.score=0; state.errors=0; state.seconds=0; state.lastTime=Date.now(); navTo('game-screen');
+            state.score=0; state.errors=0; state.seconds=0; state.lastTime=Date.now(); state.isGameOver=false; navTo('game-screen');
             document.getElementById('grid-container').style.display = ui==='grid'?'block':'none';
             document.getElementById('kb-area').style.display = ui==='kb'?'block':'none';
             document.getElementById('target-sum-display').style.display = (config.type===5)?'block':'none';
             document.getElementById('grid-back-btn').onclick = () => navTo(config.type===5?'mixed-hub-menu':'som10-grid-menu');
+            document.getElementById('retry-btn').style.display = 'none'; document.getElementById('msg').innerText = "";
             if (ui === 'grid') { initGrid(Math.floor(Math.min(window.innerWidth-30, 460)/config.size)); } else initKeyboard();
             startTimer('stat-timer'); updateGridStats();
         }
         function initGrid(cs) {
             const container = document.getElementById('grid-container'); container.innerHTML = ''; container.style.width = (config.size * cs) + 'px'; container.style.height = (config.size * cs) + 'px';
             grid = []; let vals = []; 
-            for (let i=0; i<(config.size*config.size)/2; i++) {
-                let v1 = Math.floor(Math.random()*9)+1, v2 = (config.type===5)?Math.floor(Math.random()*9)+1:(10-v1);
-                vals.push(v1, v2);
-            }
-            vals.sort(()=>Math.random()-0.5);
+            for (let i=0; i<(config.size*config.size); i++) { vals.push(Math.floor(Math.random()*9)+1); }
             for (let r=0; r<config.size; r++) {
                 for (let c=0; c<config.size; c++) {
                     const val = vals[r*config.size+c], el = document.createElement('div'); el.className = 'cell'; el.innerText = val;
@@ -317,7 +314,6 @@
         
         function onCellClick(obj) {
             if(state.isGameOver) return;
-            // CPU MODE (2 en 5)
             if(config.type === 2 || config.type === 5) { 
                 const target = (config.type===5)?state.targetSum:10;
                 if(state.cpuTarget && obj.val + state.cpuTarget.val === target && obj !== state.cpuTarget){ 
@@ -325,7 +321,6 @@
                 } else { state.errors++; soundError(); updateGridStats(); } 
                 return; 
             }
-            // REGULAR MODE
             if(!state.selected) { state.selected = obj; obj.el.classList.add('selected'); }
             else {
                 if(state.selected===obj) { obj.el.classList.remove('selected'); state.selected=null; }
@@ -337,27 +332,28 @@
         function applyGravity() { for(let c=0; c<config.size; c++) { let col = grid.filter(x => x.c === c).sort((a,b) => b.r - a.r); col.forEach((cell, idx) => { cell.r = (config.size - 1) - idx; cell.el.style.top = (cell.r * cell.cellSize + 2) + 'px'; }); } }
         
         function cpuPick() { 
-            if(state.isGameOver) return; 
+            if(state.isGameOver || grid.length < 2) return; 
             let p = []; 
             if(config.type === 5) {
-                // Find valid pairs for mixed mode
-                for(let i=0; i<grid.length; i++) {
-                    for(let j=i+1; j<grid.length; j++) p.push([grid[i], grid[j]]);
-                }
+                // Vind EEN willekeurig paar op het bord om een oplossing te garanderen
+                let i = Math.floor(Math.random()*grid.length);
+                let j = Math.floor(Math.random()*grid.length);
+                while(i === j) { j = Math.floor(Math.random()*grid.length); }
+                p.push([grid[i], grid[j]]);
             } else {
                 for(let i=0; i<grid.length; i++) {
                     for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) p.push([grid[i], grid[j]]);
                 }
             }
             if(p.length > 0) { 
-                let randomPair = p[Math.floor(Math.random()*p.length)];
-                state.cpuTarget = randomPair[0];
+                let pair = p[Math.floor(Math.random()*p.length)];
+                state.cpuTarget = pair[0];
                 if(config.type === 5) {
-                    state.targetSum = state.cpuTarget.val + randomPair[1].val;
+                    state.targetSum = state.cpuTarget.val + pair[1].val;
                     document.getElementById('target-sum-display').innerText = `Maak som: ${state.targetSum}`;
                 }
                 state.cpuTarget.el.classList.add('cpu-hint'); 
-            } 
+            } else { checkWin(); } // Geen paren meer (som 10)
         }
         
         function initKeyboard() { const inp = document.getElementById('kb-input'), n1e = document.getElementById('kb-n1'); let n1 = Math.floor(Math.random()*9)+1; n1e.innerText = n1; inp.value = ""; inp.focus(); inp.oninput = () => { if(parseInt(inp.value)+n1===10) { soundCorrect(); state.score+=50; updateGridStats(); n1=Math.floor(Math.random()*9)+1; n1e.innerText=n1; inp.value=""; inp.focus(); } else if(inp.value.length>=1){ state.errors++; soundError(); updateGridStats(); inp.value=""; } }; }
@@ -381,7 +377,16 @@
         function updateSimpleStats() { document.getElementById('simple-score').innerText = state.score; document.getElementById('simple-correct').innerText = state.correct; document.getElementById('simple-errors').innerText = state.errors; }
 
         function startTimer(id) { clearInterval(timerInterval); timerInterval = setInterval(() => { state.seconds++; const el = document.getElementById(id); if(el) el.innerText = state.seconds; }, 1000); }
-        function checkWin() { let p = false; const target = (config.type===5)?state.targetSum:10; for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===target) p=true; } if(grid.length === 0 || !p) { state.isGameOver=true; clearInterval(timerInterval); document.getElementById('msg').innerText = grid.length===0?"🎉 GEWONNEN!":"⛔ STOP!"; document.getElementById('retry-btn').style.display='flex'; return true; } return false; }
+        function checkWin() { 
+            let possible = false; 
+            if(config.type === 5) {
+                possible = grid.length >= 2;
+            } else {
+                for(let i=0; i<grid.length; i++) { for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===10) possible=true; }
+            }
+            if(grid.length === 0 || !possible) { state.isGameOver=true; clearInterval(timerInterval); document.getElementById('msg').innerText = grid.length===0?"🎉 GEWONNEN!":"⛔ STOP!"; document.getElementById('retry-btn').style.display='flex'; return true; } 
+            return false; 
+        }
         function restartGame() { if(config.type === 3) startActualGame('kb'); else startActualGame('grid'); }
     </script>
 </body>
