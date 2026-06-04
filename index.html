@@ -1043,7 +1043,7 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 5.7</div>
+        <div class="version">Versie 5.8</div>
     </div>
 
     <!-- 0. HOOFDMENU -->
@@ -1080,7 +1080,9 @@
     <div id="sommen-menu" class="screen">
         <h2>Oefen optellen:</h2>
         <button class="btn btn-blue favorite-source" data-favorite-id="plus_under_10" onclick="startSimpleGame('plus_under_10')">🟢 Onder 10</button>
+        <button class="btn btn-blue favorite-source" data-favorite-id="plus_under_10_missing" onclick="startSimpleGame('plus_under_10_missing')">🔎 Onder 10 (zoek het tweede getal)</button>
         <button class="btn btn-blue" onclick="navTo('plus-10-20-menu')">🟡 Tussen 10 en 20</button>
+        <button class="btn btn-blue favorite-source" data-favorite-id="mixed_gravity" onclick="prepareGrid(5)">🪐 Gravityspel (Optellen)</button>
         <button class="btn btn-orange" onclick="openBridgeSelection('plus', 'sommen-menu')">🔴 Over 10 (Brugmethode)</button>
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
@@ -1097,6 +1099,7 @@
     <div id="aftrekken-menu" class="screen">
         <h2>Oefen aftrekken:</h2>
         <button class="btn btn-orange favorite-source" data-favorite-id="min_under_10" onclick="startSimpleGame('min_under_10')">🟢 Onder 10</button>
+        <button class="btn btn-orange favorite-source" data-favorite-id="min_under_10_missing" onclick="startSimpleGame('min_under_10_missing')">🔎 Onder 10 (zoek het tweede getal)</button>
         <button class="btn btn-orange" onclick="openBridgeSelection('min', 'aftrekken-menu')">🔴 Over 10 (Brugmethode)</button>
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
@@ -1104,7 +1107,6 @@
     <!-- 4. GEMENGD MENU -->
     <div id="mixed-hub-menu" class="screen">
         <h2>Gemengde bewerkingen:</h2>
-        <button class="btn btn-mixed favorite-source" data-favorite-id="mixed_gravity" onclick="prepareGrid(5)">🪐 Gravityspel (Gemengd)</button>
         <button class="btn btn-mixed" onclick="openBridgeSelection('mixed', 'mixed-hub-menu')">🌉 Optellen én aftrekken (Brug)</button>
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
@@ -1189,11 +1191,13 @@
             grid_cpu: { label: '🤖 Computer Kiest', className: '', start: () => prepareGrid(2, 'main-menu') },
             keyboard_race: { label: '⌨️ Toetsenbord Race', className: '', start: () => openKeyboardRace('main-menu') },
             grid_gravity: { label: '🪐 Gravity Mode', className: '', start: () => prepareGrid(4, 'main-menu') },
-            mixed_gravity: { label: '🪐 Gravityspel (Gemengd)', className: 'btn-mixed', start: () => prepareGrid(5, 'main-menu') },
+            mixed_gravity: { label: '🪐 Gravityspel (Optellen)', className: 'btn-blue', start: () => prepareGrid(5, 'main-menu') },
             plus_under_10: { label: '➕ Optellen Onder 10', className: 'btn-blue', start: () => startSimpleGame('plus_under_10', 'main-menu') },
+            plus_under_10_missing: { label: '➕ Optellen Onder 10 - Zoek het tweede getal', className: 'btn-blue', start: () => startSimpleGame('plus_under_10_missing', 'main-menu') },
             plus_10_20_easy: { label: '➕ 10 tot 20 - Makkelijk', className: 'btn-blue', start: () => startSimpleGame('plus_10_20_easy', 'main-menu') },
             plus_10_20: { label: '➕ 10 tot 20 - Gevorderd', className: 'btn-blue', start: () => startSimpleGame('plus_10_20', 'main-menu') },
             min_under_10: { label: '➖ Aftrekken Onder 10', className: 'btn-orange', start: () => startSimpleGame('min_under_10', 'main-menu') },
+            min_under_10_missing: { label: '➖ Aftrekken Onder 10 - Zoek het tweede getal', className: 'btn-orange', start: () => startSimpleGame('min_under_10_missing', 'main-menu') },
             bridge_plus_normal: { label: '🌉 Optellen over 10 - Stap voor Stap', className: 'btn-orange', start: () => startBridgeFavorite('plus', 'normal') },
             bridge_plus_mental: { label: '🌉 Optellen over 10 - Onthoud de Rest', className: 'btn-orange', start: () => startBridgeFavorite('plus', 'mental') },
             bridge_plus_hard: { label: '🌉 Optellen over 10 - Uit het hoofd', className: 'btn-orange', start: () => startBridgeFavorite('plus', 'hard') },
@@ -1425,7 +1429,7 @@
         function updateBridgeStats() { document.getElementById('bridge-score').innerText = state.score; document.getElementById('bridge-correct').innerText = state.correct; document.getElementById('bridge-errors').innerText = state.errors; }
 
         /* RASTER LOGICA */
-        function prepareGrid(type, backMenu) { config.type = type; config.lastMenu = backMenu || (type===5?'mixed-hub-menu':'som10-grid-menu'); document.getElementById('level-back-btn').onclick = () => navTo(config.lastMenu); navTo('level-screen'); }
+        function prepareGrid(type, backMenu) { config.type = type; config.lastMenu = backMenu || (type===5?'sommen-menu':'som10-grid-menu'); document.getElementById('level-back-btn').onclick = () => navTo(config.lastMenu); navTo('level-screen'); }
         function finalizeGridStart(size) { config.size = size; startActualGame('grid'); }
         function openKeyboardRace(backMenu) { config.type = 3; config.lastMenu = backMenu || 'som10-grid-menu'; startActualGame('kb'); }
         function startActualGame(ui) {
@@ -1433,7 +1437,7 @@
             document.getElementById('grid-container').style.display = ui==='grid'?'block':'none';
             document.getElementById('kb-area').style.display = ui==='kb'?'block':'none';
             document.getElementById('target-sum-display').style.display = (config.type===5)?'block':'none';
-            document.getElementById('grid-back-btn').onclick = () => navTo(config.lastMenu || (config.type===5?'mixed-hub-menu':'som10-grid-menu'));
+            document.getElementById('grid-back-btn').onclick = () => navTo(config.lastMenu || (config.type===5?'sommen-menu':'som10-grid-menu'));
             if (ui === 'grid') { initGrid(Math.floor(Math.min(window.innerWidth-30, 460)/config.size)); } else initKeyboard();
             startTimer('stat-timer'); updateGridStats();
         }
@@ -1474,7 +1478,7 @@
         function startSimpleGame(mode, backMenu) { 
             config.simpleMode = mode; state.score=0; state.seconds=0; state.correct=0; state.errors=0; 
             const filterBar = document.getElementById('filter-bar'); filterBar.innerHTML = "";
-            if(mode === 'plus_under_10' || mode === 'min_under_10') {
+            if(mode === 'plus_under_10' || mode === 'min_under_10' || mode === 'plus_under_10_missing' || mode === 'min_under_10_missing') {
                 filterBar.style.display = "flex";
                 for(let i=1; i<=9; i++) {
                     const b = document.createElement('div'); b.className = `filter-btn ${config.allowedNumbers.includes(i)?'active':''}`; b.innerText = i;
@@ -1491,10 +1495,14 @@
             if (config.simpleMode === 'plus_10_20_easy') { n1 = 10 + Math.floor(Math.random() * 8) + 1; n2 = Math.floor(Math.random() * (19 - n1)) + 1; ans = n1 + n2; let u1 = n1 - 10; sumDisplay.innerHTML = `<span id="ghost-start" class="ten-faded">1</span><span class="unit-highlight">${u1}</span> + <span class="unit-highlight">${n2}</span> = ?`; helpArea.style.display="flex"; finalArea.style.display="none"; document.getElementById('unit-sum-display').innerHTML = `<span class="unit-highlight">${u1} + ${n2}</span>`; const uInp = document.getElementById('unit-input'); uInp.value=""; uInp.readOnly=false; uInp.focus(); uInp.oninput = () => { if (parseInt(uInp.value) === (u1 + n2)) { soundCorrect(); uInp.readOnly=true; animateGhost(ans); } else if (uInp.value.length >= 1) { soundError(); state.errors++; updateSimpleStats(); uInp.value=""; } }; } 
             else { 
                 const list = config.allowedNumbers;
-                if (config.simpleMode === 'plus_under_10') { let p = []; for(let a of list) for(let b of list) if(a+b<=10)p.push([a,b]); let r=p[Math.floor(Math.random()*p.length)]; n1=r[0]; n2=r[1]; ans=n1+n2; } 
-                else if (config.simpleMode === 'min_under_10') { let p = []; for(let a of list) for(let b of list) if(a-b>=0)p.push([a,b]); let r=p[Math.floor(Math.random()*p.length)]; n1=r[0]; n2=r[1]; ans=n1-n2; }
+                if (config.simpleMode === 'plus_under_10' || config.simpleMode === 'plus_under_10_missing') { let p = []; for(let a of list) for(let b of list) if(a+b<=10)p.push([a,b]); let r=p[Math.floor(Math.random()*p.length)]; n1=r[0]; n2=r[1]; ans=config.simpleMode === 'plus_under_10_missing' ? n2 : n1+n2; } 
+                else if (config.simpleMode === 'min_under_10' || config.simpleMode === 'min_under_10_missing') { let p = []; for(let a of list) for(let b of list) if(a-b>=0)p.push([a,b]); let r=p[Math.floor(Math.random()*p.length)]; n1=r[0]; n2=r[1]; ans=config.simpleMode === 'min_under_10_missing' ? n2 : n1-n2; }
                 else { n1 = 10+Math.floor(Math.random()*6); n2 = Math.floor(Math.random()*4)+1; ans = n1+n2; }
-                sumDisplay.innerHTML = `<span>${n1}</span> <span>${config.simpleMode.startsWith('plus')?'+':'-'}</span> <span>${n2}</span> <span>= ?</span>`; 
+                if (config.simpleMode.endsWith('_missing')) {
+                    sumDisplay.innerHTML = `<span>${n1}</span> <span>${config.simpleMode.startsWith('plus')?'+':'-'}</span> <span>?</span> <span>= ${config.simpleMode.startsWith('plus') ? n1+n2 : n1-n2}</span>`;
+                } else {
+                    sumDisplay.innerHTML = `<span>${n1}</span> <span>${config.simpleMode.startsWith('plus')?'+':'-'}</span> <span>${n2}</span> <span>= ?</span>`;
+                }
                 const inp = document.getElementById('simple-input'); inp.value=""; inp.focus(); inp.oninput = () => { if (parseInt(inp.value) === ans) { soundCorrect(); state.score+=20; state.correct++; updateSimpleStats(); nextSimpleTask(); } else if (inp.value.length >= (ans>9?2:1)) { soundError(); state.errors++; updateSimpleStats(); inp.value=""; } }; 
             }
         }
