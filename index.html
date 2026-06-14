@@ -526,6 +526,237 @@
             text-align: center;
         }
 
+        .bridge-written-panel,
+        .bridge-visual-board {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dot-number-blue {
+            color: #2563eb !important;
+            text-shadow: 0 2px 0 rgba(255,255,255,0.85), 0 12px 24px rgba(37,99,235,0.18);
+        }
+
+        .dot-number-red {
+            color: #dc2626 !important;
+            text-shadow: 0 2px 0 rgba(255,255,255,0.85), 0 12px 24px rgba(220,38,38,0.18);
+        }
+
+        .dots-toggle {
+            align-self: center;
+            min-height: 42px;
+            padding: 9px 14px;
+            border: 1px solid rgba(148, 163, 184, 0.36);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffffff, #eef5ff);
+            color: var(--ink);
+            font: inherit;
+            font-size: 0.92rem;
+            font-weight: 900;
+            box-shadow: 0 8px 18px rgba(18, 32, 51, 0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .dots-toggle.active {
+            border-color: rgba(37, 99, 235, 0.46);
+            background: linear-gradient(180deg, #dff2ff, #bfe3ff);
+            color: #0f4fb5;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.16);
+        }
+
+        .bridge-dots-helper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .bridge-dots-helper[hidden] {
+            display: none !important;
+        }
+
+        .dot-helper-stage {
+            width: 100%;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: clamp(8px, 2vw, 12px);
+            flex-wrap: nowrap;
+        }
+
+        .dot-helper-group {
+            min-width: 0;
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 58px;
+            padding: 7px 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.78);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.78);
+        }
+
+        .dot-helper-group.active {
+            outline: 3px solid rgba(248, 198, 48, 0.46);
+            background: rgba(255, 250, 214, 0.86);
+        }
+
+        .dot-helper-dots {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-content: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .equation-input {
+            width: min(100%, 440px);
+            min-height: 68px;
+            border: 2px solid #cfd9e6;
+            border-radius: 8px;
+            text-align: center;
+            font-size: clamp(1.6rem, 8vw, 2.4rem);
+            font-family: inherit;
+            font-weight: 900;
+            color: var(--primary);
+            background: white;
+            outline: none;
+            letter-spacing: 0;
+            box-shadow: inset 0 1px 0 rgba(18, 32, 51, 0.04), 0 12px 22px rgba(18, 32, 51, 0.1);
+        }
+
+        .equation-input.correct {
+            border-color: var(--secondary);
+            background: #e7fff9;
+            color: #047857;
+        }
+
+        .equation-keypad {
+            width: min(100%, 360px);
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .keypad-btn {
+            min-height: 48px;
+            border: 1px solid rgba(148, 163, 184, 0.38);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffffff, #eef5ff);
+            color: var(--ink);
+            font: inherit;
+            font-size: 1.1rem;
+            font-weight: 900;
+            box-shadow: 0 8px 16px rgba(18, 32, 51, 0.1);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .keypad-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 10px rgba(18, 32, 51, 0.1);
+        }
+
+        .bridge-work-row.written-mode,
+        .bridge-work-row.visual-mode {
+            white-space: normal;
+            padding: 14px;
+        }
+
+        .dot-pools {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .dot-pool,
+        .dot-target {
+            min-height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.76);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+        }
+
+        .dot-pool {
+            min-height: 76px;
+        }
+
+        .dot-pool-label {
+            width: 100%;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.72rem;
+            line-height: 1;
+            font-weight: 900;
+        }
+
+        .visual-equation {
+            width: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: clamp(4px, 1.6vw, 10px);
+            flex-wrap: nowrap;
+        }
+
+        .visual-slot {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .visual-slot .num-input {
+            width: clamp(48px, 13vw, 72px);
+        }
+
+        .visual-op {
+            padding-bottom: clamp(12px, 4vw, 18px);
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            font-weight: 900;
+            color: #334155;
+        }
+
+        .dot {
+            width: clamp(10px, 2.6vw, 15px);
+            height: clamp(10px, 2.6vw, 15px);
+            border-radius: 50%;
+            box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.5), 0 4px 8px rgba(18, 32, 51, 0.12);
+        }
+
+        .dot.blue {
+            background: linear-gradient(180deg, #60a5fa, #2563eb);
+        }
+
+        .dot.red {
+            background: linear-gradient(180deg, #fb7185, #dc2626);
+        }
+
+        .dot.is-new {
+            animation: dotMoveIn 0.34s ease-out both;
+        }
+
+        @keyframes dotMoveIn {
+            from { transform: translateY(-16px) scale(0.78); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
         #simple-help-area {
             width: 100%;
             display: flex;
@@ -1025,6 +1256,109 @@
             }
 
             #grid-container { border-width: 5px; }
+
+            body.bridge-active {
+                padding: 8px;
+            }
+
+            body.bridge-active .header-container {
+                display: none;
+            }
+
+            body.bridge-active .screen {
+                gap: 6px;
+            }
+
+            body.bridge-active .stats-wrapper {
+                gap: 4px;
+                padding: 4px;
+                margin-bottom: 0;
+            }
+
+            body.bridge-active .stat-item {
+                min-height: 34px;
+                font-size: 0.62rem;
+            }
+
+            body.bridge-active .stat-val {
+                font-size: 0.95rem;
+            }
+
+            body.bridge-active .game-box {
+                padding: 10px 8px;
+            }
+
+            body.bridge-active .bridge-sum-row {
+                gap: 6px;
+                margin-bottom: 2px;
+                font-size: clamp(1.5rem, 8vw, 2.15rem);
+            }
+
+            body.bridge-active .dots-toggle {
+                min-height: 32px;
+                padding: 5px 10px;
+                font-size: 0.78rem;
+            }
+
+            body.bridge-active .dot-helper-stage {
+                gap: 6px;
+            }
+
+            body.bridge-active .dot-helper-group {
+                min-height: 42px;
+                padding: 5px;
+            }
+
+            body.bridge-active .dot-helper-dots {
+                min-height: 20px;
+                gap: 3px;
+            }
+
+            body.bridge-active .dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            body.bridge-active .bridge-work-row {
+                min-height: 48px;
+                padding: 7px 6px;
+                gap: 4px;
+                font-size: clamp(1rem, 4.5vw, 1.3rem);
+            }
+
+            body.bridge-active .num-input {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+            }
+
+            body.bridge-active .equation-input {
+                min-height: 48px;
+                font-size: 1.35rem;
+            }
+
+            body.bridge-active .equation-keypad {
+                width: min(100%, 320px);
+                gap: 5px;
+            }
+
+            body.bridge-active .keypad-btn {
+                min-height: 34px;
+                font-size: 0.95rem;
+            }
+
+            body.bridge-active #bridge-hint {
+                min-height: 25px;
+                margin-top: 4px !important;
+                padding: 4px 8px;
+                font-size: 0.72rem !important;
+            }
+
+            body.bridge-active #bridge-game-back-btn {
+                min-height: 38px;
+                padding: 8px 12px;
+                font-size: 0.95rem;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1043,7 +1377,7 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 5.8</div>
+        <div class="version">Versie 5.11</div>
     </div>
 
     <!-- 0. HOOFDMENU -->
@@ -1084,6 +1418,7 @@
         <button class="btn btn-blue" onclick="navTo('plus-10-20-menu')">🟡 Tussen 10 en 20</button>
         <button class="btn btn-blue favorite-source" data-favorite-id="mixed_gravity" onclick="prepareGrid(5)">🪐 Gravityspel (Optellen)</button>
         <button class="btn btn-orange" onclick="openBridgeSelection('plus', 'sommen-menu')">🔴 Over 10 (Brugmethode)</button>
+        <button class="btn btn-blue favorite-source" data-favorite-id="bridge_plus_written" onclick="startBridgeDirect('plus', 'written', 'sommen-menu')">✍️ Over 10 (voluit schrijven)</button>
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
@@ -1101,6 +1436,7 @@
         <button class="btn btn-orange favorite-source" data-favorite-id="min_under_10" onclick="startSimpleGame('min_under_10')">🟢 Onder 10</button>
         <button class="btn btn-orange favorite-source" data-favorite-id="min_under_10_missing" onclick="startSimpleGame('min_under_10_missing')">🔎 Onder 10 (zoek het tweede getal)</button>
         <button class="btn btn-orange" onclick="openBridgeSelection('min', 'aftrekken-menu')">🔴 Over 10 (Brugmethode)</button>
+        <button class="btn btn-orange favorite-source" data-favorite-id="bridge_min_written" onclick="startBridgeDirect('min', 'written', 'aftrekken-menu')">✍️ Over 10 (voluit schrijven)</button>
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
@@ -1108,6 +1444,8 @@
     <div id="mixed-hub-menu" class="screen">
         <h2>Gemengde bewerkingen:</h2>
         <button class="btn btn-mixed" onclick="openBridgeSelection('mixed', 'mixed-hub-menu')">🌉 Optellen én aftrekken (Brug)</button>
+        <button class="btn btn-mixed favorite-source" data-favorite-id="bridge_mixed_same" onclick="startBridgeDirect('mixed', 'mixed_same', 'mixed-hub-menu')">🔁 Eerst streepjes, dan voluit</button>
+        <button class="btn btn-mixed favorite-source" data-favorite-id="bridge_mixed_random" onclick="startBridgeDirect('mixed', 'mixed_random', 'mixed-hub-menu')">🎲 Willekeurige layout</button>
         <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
@@ -1139,11 +1477,13 @@
         </div>
         <div class="game-box">
             <div id="bridge-main-sum" class="bridge-sum-row"></div>
+            <button type="button" id="bridge-dots-toggle" class="dots-toggle" onclick="toggleBridgeDots()" aria-pressed="false">Bolletjes tonen</button>
+            <div id="bridge-dots-helper" class="bridge-dots-helper" hidden></div>
             <svg id="split-svg" class="split-svg" viewBox="0 0 360 58"><line id="split-line-left" x1="180" y1="5" x2="128" y2="53" class="split-line" /><line id="split-line-right" x1="180" y1="5" x2="232" y2="53" class="split-line" /></svg>
             <div id="bridge-work-row" class="bridge-work-row"></div>
             <div id="bridge-hint" style="margin-top:10px; font-size: 0.9rem; color:#636e72;"></div>
         </div>
-        <button class="btn btn-back" onclick="navTo('bridge-selection-menu')">Terug</button>
+        <button class="btn btn-back" id="bridge-game-back-btn">Terug</button>
     </div>
 
     <div id="simple-game-screen" class="screen">
@@ -1181,11 +1521,13 @@
     </div>
 
     <script>
-        let config = { type: 1, size: 8, bridgeSubMode: 'normal', bridgeOp: 'plus', simpleMode: '', lastMenu: 'main-menu', allowedNumbers: [1,2,3,4,5,6,7,8,9] };
+        let config = { type: 1, size: 8, bridgeSubMode: 'normal', bridgeOp: 'plus', bridgeBackTarget: 'bridge-selection-menu', showBridgeDots: false, simpleMode: '', lastMenu: 'main-menu', allowedNumbers: [1,2,3,4,5,6,7,8,9] };
         let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, correct: 0, isGameOver: false, selected: null, cpuTarget: null, targetSum: 10 };
         let bData = {};
         let timerInterval, audioCtx, audioUnlocked = false;
         const FAVORITES_KEY = 'louies_rekentrainer_favorites_v1';
+        const BRIDGE_DOTS_KEY = 'louies_rekentrainer_bridge_dots_v1';
+        config.showBridgeDots = localStorage.getItem(BRIDGE_DOTS_KEY) === 'true';
         const FAVORITE_GAMES = {
             grid_classic: { label: '🧩 Klassiek Raster', className: '', start: () => prepareGrid(1, 'main-menu') },
             grid_cpu: { label: '🤖 Computer Kiest', className: '', start: () => prepareGrid(2, 'main-menu') },
@@ -1201,12 +1543,16 @@
             bridge_plus_normal: { label: '🌉 Optellen over 10 - Stap voor Stap', className: 'btn-orange', start: () => startBridgeFavorite('plus', 'normal') },
             bridge_plus_mental: { label: '🌉 Optellen over 10 - Onthoud de Rest', className: 'btn-orange', start: () => startBridgeFavorite('plus', 'mental') },
             bridge_plus_hard: { label: '🌉 Optellen over 10 - Uit het hoofd', className: 'btn-orange', start: () => startBridgeFavorite('plus', 'hard') },
+            bridge_plus_written: { label: '✍️ Optellen over 10 - Voluit schrijven', className: 'btn-blue', start: () => startBridgeDirect('plus', 'written', 'main-menu') },
             bridge_min_normal: { label: '🌉 Aftrekken over 10 - Stap voor Stap', className: 'btn-orange', start: () => startBridgeFavorite('min', 'normal') },
             bridge_min_mental: { label: '🌉 Aftrekken over 10 - Onthoud de Rest', className: 'btn-orange', start: () => startBridgeFavorite('min', 'mental') },
             bridge_min_hard: { label: '🌉 Aftrekken over 10 - Uit het hoofd', className: 'btn-orange', start: () => startBridgeFavorite('min', 'hard') },
+            bridge_min_written: { label: '✍️ Aftrekken over 10 - Voluit schrijven', className: 'btn-orange', start: () => startBridgeDirect('min', 'written', 'main-menu') },
             bridge_mixed_normal: { label: '🌉 Gemengde brug - Stap voor Stap', className: 'btn-mixed', start: () => startBridgeFavorite('mixed', 'normal') },
             bridge_mixed_mental: { label: '🌉 Gemengde brug - Onthoud de Rest', className: 'btn-mixed', start: () => startBridgeFavorite('mixed', 'mental') },
-            bridge_mixed_hard: { label: '🌉 Gemengde brug - Uit het hoofd', className: 'btn-mixed', start: () => startBridgeFavorite('mixed', 'hard') }
+            bridge_mixed_hard: { label: '🌉 Gemengde brug - Uit het hoofd', className: 'btn-mixed', start: () => startBridgeFavorite('mixed', 'hard') },
+            bridge_mixed_same: { label: '🔁 Gemengd - Eerst streepjes, dan voluit', className: 'btn-mixed', start: () => startBridgeDirect('mixed', 'mixed_same', 'main-menu') },
+            bridge_mixed_random: { label: '🎲 Gemengd - Willekeurige layout', className: 'btn-mixed', start: () => startBridgeDirect('mixed', 'mixed_random', 'main-menu') }
         };
 
         function unlockSilentAudio() { if(!audioCtx || audioUnlocked) return; try { let o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(440,audioCtx.currentTime); g.gain.setValueAtTime(0.0001,audioCtx.currentTime); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.03); audioUnlocked=true; } catch(e){} }
@@ -1341,6 +1687,14 @@
         function startBridgeFavorite(op, sub) {
             config.bridgeOp = op;
             config.lastMenu = 'main-menu';
+            config.bridgeBackTarget = 'main-menu';
+            initBridgeGame(sub);
+        }
+
+        function startBridgeDirect(op, sub, backMenu) {
+            config.bridgeOp = op;
+            config.lastMenu = backMenu;
+            config.bridgeBackTarget = backMenu;
             initBridgeGame(sub);
         }
 
@@ -1349,6 +1703,7 @@
             document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; s.classList.remove('active'); });
             const target = document.getElementById(id);
             if(target) { target.style.display = 'flex'; target.classList.add('active'); }
+            document.body.classList.toggle('bridge-active', id === 'bridge-game-screen');
             if(id === 'main-menu') renderFavorites();
             clearInterval(timerInterval);
         }
@@ -1404,28 +1759,365 @@
         window.addEventListener('orientationchange', scheduleSplitLineUpdate);
 
         /* BRUGMETHODE LOGICA */
-        function openBridgeSelection(op, from) { config.bridgeOp = op; config.lastMenu = from; document.getElementById('bridge-back-btn').onclick = () => navTo(config.lastMenu); syncBridgeFavoriteButtons(); navTo('bridge-selection-menu'); }
-        function initBridgeGame(sub) { config.bridgeSubMode = sub; state.score=0; state.seconds=0; state.correct=0; state.errors=0; navTo('bridge-game-screen'); updateBridgeStats(); nextBridgeTask(); startTimer('bridge-timer'); }
+        function openBridgeSelection(op, from) {
+            config.bridgeOp = op;
+            config.lastMenu = from;
+            config.bridgeBackTarget = 'bridge-selection-menu';
+            document.getElementById('bridge-back-btn').onclick = () => navTo(config.lastMenu);
+            syncBridgeFavoriteButtons();
+            navTo('bridge-selection-menu');
+        }
+
+        function initBridgeGame(sub) {
+            config.bridgeSubMode = sub;
+            state.score=0; state.seconds=0; state.correct=0; state.errors=0;
+            bData = {};
+            document.getElementById('bridge-game-back-btn').onclick = () => navTo(config.bridgeBackTarget || 'bridge-selection-menu');
+            updateBridgeDotsToggle();
+            navTo('bridge-game-screen');
+            updateBridgeStats();
+            nextBridgeTask();
+            startTimer('bridge-timer');
+        }
+
+        function toggleBridgeDots() {
+            config.showBridgeDots = !config.showBridgeDots;
+            localStorage.setItem(BRIDGE_DOTS_KEY, config.showBridgeDots ? 'true' : 'false');
+            updateBridgeDotsToggle();
+            renderBridgeDotsHelper();
+        }
+
+        function updateBridgeDotsToggle() {
+            const btn = document.getElementById('bridge-dots-toggle');
+            if(!btn) return;
+            btn.classList.toggle('active', config.showBridgeDots);
+            btn.textContent = config.showBridgeDots ? 'Bolletjes verbergen' : 'Bolletjes tonen';
+            btn.setAttribute('aria-pressed', config.showBridgeDots ? 'true' : 'false');
+        }
+
+        function getBridgeOperator() {
+            return bData.op === 'plus' ? '+' : '-';
+        }
+
+        function createBridgeData(op) {
+            const realOp = op === 'mixed' ? (Math.random() > 0.5 ? 'plus' : 'min') : op;
+            if (realOp === 'plus') {
+                bData = { op: realOp, n1: Math.floor(Math.random()*4)+6, n2: Math.floor(Math.random()*4)+5 };
+                bData.s1 = 10-bData.n1;
+                bData.s2 = bData.n2-bData.s1;
+                bData.tot = bData.n1+bData.n2;
+            } else {
+                bData = { op: realOp, n1: Math.floor(Math.random()*5)+11 };
+                bData.s1 = bData.n1-10;
+                bData.tot = Math.floor(Math.random()*5)+5;
+                bData.n2 = bData.n1-bData.tot;
+                bData.s2 = bData.n2-bData.s1;
+            }
+        }
+
+        function resetBridgeWork(className) {
+            const row = document.getElementById('bridge-work-row');
+            row.className = `bridge-work-row${className ? ' ' + className : ''}`;
+            row.innerHTML = '';
+            document.getElementById('split-svg').style.display = className ? 'none' : 'block';
+            return row;
+        }
+
+        function completeBridgeExercise(points=50) {
+            state.score += points;
+            state.correct++;
+            updateBridgeStats();
+            const repeatAsWritten = config.bridgeSubMode === 'mixed_same' && bData.layout === 'lines';
+            setTimeout(() => {
+                if (repeatAsWritten) renderBridgeWrittenTask(true);
+                else nextBridgeTask();
+            }, 800);
+        }
+
         function nextBridgeTask() {
-            let op = config.bridgeOp; if(op === 'mixed') op = Math.random() > 0.5 ? 'plus' : 'min';
-            if (op === 'plus') { bData.n1 = Math.floor(Math.random()*4)+6; bData.n2 = Math.floor(Math.random()*4)+5; bData.s1 = 10-bData.n1; bData.s2 = bData.n2-bData.s1; bData.tot = bData.n1+bData.n2; }
-            else { bData.n1 = Math.floor(Math.random()*5)+11; bData.s1 = bData.n1-10; bData.tot = Math.floor(Math.random()*5)+5; bData.n2 = bData.n1-bData.tot; bData.s2 = bData.n2-bData.s1; }
-            const operator = op === 'plus' ? '+' : '-';
-            document.getElementById('bridge-main-sum').innerHTML = `<span>${bData.n1}</span><span>${operator}</span><span id="bridge-split-source" style="color:var(--bridge-color)">${bData.n2}</span><span>=?</span>`;
-            document.getElementById('bridge-work-row').innerHTML = `<span>${bData.n1}</span><span>${operator}</span><div id="s1-container"></div><span>${operator}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
+            if (config.bridgeSubMode === 'mixed_random') {
+                createBridgeData('mixed');
+                if (Math.random() > 0.5) renderBridgeLineTask('normal');
+                else renderBridgeWrittenTask(false);
+                return;
+            }
+            createBridgeData(config.bridgeOp);
+            if (config.bridgeSubMode === 'written') renderBridgeWrittenTask(false);
+            else renderBridgeLineTask(config.bridgeSubMode === 'mixed_same' ? 'normal' : config.bridgeSubMode);
+        }
+
+        function renderBridgeHeader() {
+            const operator = getBridgeOperator();
+            document.getElementById('bridge-main-sum').innerHTML = `<span class="dot-number-blue">${bData.n1}</span><span>${operator}</span><span id="bridge-split-source" class="dot-number-red">${bData.n2}</span><span>=?</span>`;
+        }
+
+        function renderBridgeDotsHelper(activeGroup) {
+            const helper = document.getElementById('bridge-dots-helper');
+            if(!helper) return;
+            if(typeof activeGroup === 'number') bData.dotStage = activeGroup;
+            helper.hidden = !config.showBridgeDots || !bData.n1;
+            if(helper.hidden) {
+                helper.innerHTML = '';
+                return;
+            }
+            const stage = typeof bData.dotStage === 'number' ? bData.dotStage : -1;
+            let groups;
+            if(stage >= 3) {
+                groups = bData.op === 'plus'
+                    ? [{ dots: dotsHtml(bData.n1, 'blue', true) + dotsHtml(bData.n2, 'red', true), active: true }]
+                    : [{ dots: dotsHtml(bData.tot, 'blue', true), active: true }];
+            } else if(stage >= 1) {
+                groups = bData.op === 'plus'
+                    ? [
+                        { dots: dotsHtml(bData.n1, 'blue', stage === 1) + dotsHtml(bData.s1, 'red', stage === 1), active: stage === 1 },
+                        { dots: dotsHtml(bData.s2, 'red', stage === 2), active: stage === 2 }
+                    ]
+                    : [
+                        { dots: dotsHtml(10, 'blue', stage === 1), active: stage === 1 },
+                        { dots: dotsHtml(bData.s1, 'red', stage === 1), active: stage === 1 },
+                        { dots: dotsHtml(bData.s2, 'red', stage === 2), active: stage === 2 }
+                    ];
+            } else {
+                groups = [
+                    { dots: dotsHtml(bData.n1, 'blue') },
+                    { dots: dotsHtml(bData.n2, 'red') }
+                ];
+            }
+            helper.innerHTML = `<div class="dot-helper-stage">${groups.map(group => `
+                <div class="dot-helper-group ${group.active ? 'active' : ''}">
+                    <div class="dot-helper-dots">${group.dots}</div>
+                </div>`).join('')}</div>`;
+        }
+
+        function renderBridgeLineTask(lineMode) {
+            bData.layout = 'lines';
+            bData.dotStage = -1;
+            renderBridgeHeader();
+            const operator = getBridgeOperator();
+            const row = resetBridgeWork('');
+            row.innerHTML = `<span class="dot-number-blue">${bData.n1}</span><span>${operator}</span><div id="s1-container"></div><span>${operator}</span><div id="s2-container"></div><span>=</span><div id="s3-container"></div>`;
+            renderBridgeDotsHelper();
             const s1c = document.getElementById('s1-container'), s2c = document.getElementById('s2-container'), s3c = document.getElementById('s3-container');
-            s1c.innerHTML = (config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
-            s2c.innerHTML = (config.bridgeSubMode === 'mental' || config.bridgeSubMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
+            s1c.innerHTML = (lineMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s1" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
+            s2c.innerHTML = (lineMode === 'mental' || lineMode === 'hard') ? '<div class="hidden-step">?</div>' : '<input type="number" id="s2" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
             s3c.innerHTML = '<input type="number" id="s3" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off">';
             const f3 = document.getElementById('s3'); f3.readOnly = true;
-            if (config.bridgeSubMode === 'hard') { document.getElementById('bridge-hint').innerText = "Reken uit..."; f3.readOnly = false; f3.focus(); }
-            else {
-                const f1 = document.getElementById('s1'); f1.focus(); document.getElementById('bridge-hint').innerText = "Maak 10...";
-                f1.oninput = (e) => { if (parseInt(e.target.value) === bData.s1) { soundCorrect(); e.target.classList.add('correct'); e.target.readOnly = true; if (config.bridgeSubMode === 'mental') { f3.readOnly = false; f3.focus(); } else { const f2 = document.getElementById('s2'); f2.focus(); f2.oninput = (ev) => { if (parseInt(ev.target.value) === bData.s2) { soundCorrect(); ev.target.classList.add('correct'); ev.target.readOnly = true; f3.readOnly = false; f3.focus(); } else if (ev.target.value.length >= 1) { soundError(); state.errors++; updateBridgeStats(); ev.target.value=""; } }; } } else if (e.target.value.length >= 1) { soundError(); state.errors++; updateBridgeStats(); e.target.value=""; } };
+            if (lineMode === 'hard') {
+                document.getElementById('bridge-hint').innerText = "Reken uit...";
+                f3.readOnly = false;
+                f3.focus();
+            } else {
+                const f1 = document.getElementById('s1');
+                f1.focus();
+                document.getElementById('bridge-hint').innerText = "Maak 10...";
+                f1.oninput = (e) => {
+                    if (parseInt(e.target.value) === bData.s1) {
+                        soundCorrect();
+                        e.target.classList.add('correct');
+                        e.target.readOnly = true;
+                        renderBridgeDotsHelper(1);
+                        if (lineMode === 'mental') {
+                            f3.readOnly = false;
+                            f3.focus();
+                        } else {
+                            const f2 = document.getElementById('s2');
+                            f2.focus();
+                            f2.oninput = (ev) => {
+                                if (parseInt(ev.target.value) === bData.s2) {
+                                    soundCorrect();
+                                    ev.target.classList.add('correct');
+                                    ev.target.readOnly = true;
+                                    renderBridgeDotsHelper(2);
+                                    f3.readOnly = false;
+                                    f3.focus();
+                                } else if (ev.target.value.length >= 1) {
+                                    soundError();
+                                    state.errors++;
+                                    updateBridgeStats();
+                                    ev.target.value="";
+                                }
+                            };
+                        }
+                    } else if (e.target.value.length >= 1) {
+                        soundError();
+                        state.errors++;
+                        updateBridgeStats();
+                        e.target.value="";
+                    }
+                };
             }
-            f3.oninput = (e) => { if (parseInt(e.target.value) === bData.tot) { soundCorrect(); e.target.classList.add('correct'); e.target.readOnly = true; state.score += 50; state.correct++; updateBridgeStats(); setTimeout(nextBridgeTask, 800); } else if (e.target.value.length >= 2) { soundError(); state.errors++; updateBridgeStats(); e.target.value = ""; } };
+            f3.oninput = (e) => {
+                if (parseInt(e.target.value) === bData.tot) {
+                    soundCorrect();
+                    e.target.classList.add('correct');
+                    e.target.readOnly = true;
+                    renderBridgeDotsHelper(3);
+                    completeBridgeExercise();
+                } else if (e.target.value.length >= String(bData.tot).length) {
+                    soundError();
+                    state.errors++;
+                    updateBridgeStats();
+                    e.target.value = "";
+                }
+            };
             scheduleSplitLineUpdate();
         }
+
+        function expectedWrittenBridge() {
+            const operator = getBridgeOperator();
+            return `${bData.n1}${operator}${bData.s1}${operator}${bData.s2}=${bData.tot}`;
+        }
+
+        function normalizeEquation(value) {
+            return value.replace(/\s+/g, '').replace(/[−–—]/g, '-');
+        }
+
+        function setupEquationKeypad(input, expected) {
+            const updateWrittenDots = (normalized) => {
+                const operator = getBridgeOperator();
+                const firstStep = `${bData.n1}${operator}${bData.s1}`;
+                const secondStep = `${firstStep}${operator}${bData.s2}`;
+                if(normalized === expected) renderBridgeDotsHelper(3);
+                else if(normalized.startsWith(secondStep)) renderBridgeDotsHelper(2);
+                else if(normalized.startsWith(firstStep)) renderBridgeDotsHelper(1);
+                else renderBridgeDotsHelper(-1);
+            };
+            const checkValue = () => {
+                input.value = input.value.replace(/[^0-9+\-=−–—]/g, '');
+                const normalized = normalizeEquation(input.value);
+                updateWrittenDots(normalized);
+                if (normalized === expected) {
+                    soundCorrect();
+                    input.classList.add('correct');
+                    input.readOnly = true;
+                    completeBridgeExercise();
+                } else if (normalized.length >= expected.length) {
+                    soundError();
+                    state.errors++;
+                    updateBridgeStats();
+                    input.value = "";
+                    renderBridgeDotsHelper(-1);
+                }
+            };
+            input.oninput = checkValue;
+            document.querySelectorAll('.keypad-btn').forEach(btn => {
+                btn.onclick = () => {
+                    if(input.readOnly) return;
+                    const key = btn.dataset.key;
+                    if(key === 'back') input.value = input.value.slice(0, -1);
+                    else if(key === 'clear') input.value = "";
+                    else input.value += key;
+                    input.focus();
+                    checkValue();
+                };
+            });
+        }
+
+        function renderBridgeWrittenTask(isRepeat) {
+            bData.layout = 'written';
+            bData.dotStage = -1;
+            renderBridgeHeader();
+            const row = resetBridgeWork('written-mode');
+            const expected = expectedWrittenBridge();
+            row.innerHTML = `<div class="bridge-written-panel">
+                <input type="text" id="bridge-written-input" class="equation-input" inputmode="none" autocomplete="off" spellcheck="false" aria-label="Volledige brugbewerking">
+                <div class="equation-keypad" aria-label="Rekentoetsen">
+                    <button type="button" class="keypad-btn" data-key="1">1</button>
+                    <button type="button" class="keypad-btn" data-key="2">2</button>
+                    <button type="button" class="keypad-btn" data-key="3">3</button>
+                    <button type="button" class="keypad-btn" data-key="+">+</button>
+                    <button type="button" class="keypad-btn" data-key="-">-</button>
+                    <button type="button" class="keypad-btn" data-key="4">4</button>
+                    <button type="button" class="keypad-btn" data-key="5">5</button>
+                    <button type="button" class="keypad-btn" data-key="6">6</button>
+                    <button type="button" class="keypad-btn" data-key="=">=</button>
+                    <button type="button" class="keypad-btn" data-key="back">⌫</button>
+                    <button type="button" class="keypad-btn" data-key="7">7</button>
+                    <button type="button" class="keypad-btn" data-key="8">8</button>
+                    <button type="button" class="keypad-btn" data-key="9">9</button>
+                    <button type="button" class="keypad-btn" data-key="0">0</button>
+                    <button type="button" class="keypad-btn" data-key="clear">Wis</button>
+                </div>
+            </div>`;
+            renderBridgeDotsHelper();
+            document.getElementById('bridge-hint').innerText = isRepeat ? "Zelfde oefening, nu voluit." : "Schrijf voluit.";
+            const input = document.getElementById('bridge-written-input');
+            input.focus();
+            setupEquationKeypad(input, expected);
+        }
+
+        function dotsHtml(count, color, isNew=false) {
+            let html = '';
+            for(let i=0; i<count; i++) html += `<span class="dot ${color}${isNew ? ' is-new' : ''}"></span>`;
+            return html;
+        }
+
+        function renderVisualDots(activeStep=-1) {
+            const done = bData.visualDone || [];
+            const bluePool = done[0] ? 0 : bData.n1;
+            let redPool = bData.n2;
+            if(done[1]) redPool -= bData.s1;
+            if(done[2]) redPool -= bData.s2;
+            document.getElementById('dot-pool-blue').innerHTML = `<span class="dot-pool-label">blauw</span>${dotsHtml(bluePool, 'blue')}`;
+            document.getElementById('dot-pool-red').innerHTML = `<span class="dot-pool-label">rood</span>${dotsHtml(Math.max(0, redPool), 'red')}`;
+            document.getElementById('dot-target-0').innerHTML = done[0] ? dotsHtml(bData.n1, 'blue', activeStep===0) : '';
+            document.getElementById('dot-target-1').innerHTML = done[1] ? dotsHtml(bData.s1, 'red', activeStep===1) : '';
+            document.getElementById('dot-target-2').innerHTML = done[2] ? dotsHtml(bData.s2, 'red', activeStep===2) : '';
+            if(done[3]) {
+                document.getElementById('dot-target-3').innerHTML = bData.op === 'plus'
+                    ? dotsHtml(bData.n1, 'blue', activeStep===3) + dotsHtml(bData.n2, 'red', activeStep===3)
+                    : dotsHtml(bData.tot, 'blue', activeStep===3);
+            } else {
+                document.getElementById('dot-target-3').innerHTML = '';
+            }
+        }
+
+        function renderBridgeVisualTask() {
+            bData.layout = 'visual';
+            bData.visualDone = [false, false, false, false];
+            renderBridgeHeader();
+            const operator = getBridgeOperator();
+            const values = [bData.n1, bData.s1, bData.s2, bData.tot];
+            const row = resetBridgeWork('visual-mode');
+            row.innerHTML = `<div class="bridge-visual-board">
+                <div class="dot-pools">
+                    <div class="dot-pool" id="dot-pool-blue"></div>
+                    <div class="dot-pool" id="dot-pool-red"></div>
+                </div>
+                <div class="visual-equation">
+                    <div class="visual-slot"><div class="dot-target" id="dot-target-0"></div><input type="number" id="visual-input-0" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div>
+                    <span class="visual-op">${operator}</span>
+                    <div class="visual-slot"><div class="dot-target" id="dot-target-1"></div><input type="number" id="visual-input-1" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div>
+                    <span class="visual-op">${operator}</span>
+                    <div class="visual-slot"><div class="dot-target" id="dot-target-2"></div><input type="number" id="visual-input-2" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div>
+                    <span class="visual-op">=</span>
+                    <div class="visual-slot"><div class="dot-target" id="dot-target-3"></div><input type="number" id="visual-input-3" class="num-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off"></div>
+                </div>
+            </div>`;
+            document.getElementById('bridge-hint').innerText = "Vul de vakjes van links naar rechts.";
+            renderVisualDots();
+            const inputs = values.map((value, index) => document.getElementById(`visual-input-${index}`));
+            inputs.forEach((input, index) => {
+                input.oninput = (e) => {
+                    if(parseInt(e.target.value) === values[index]) {
+                        soundCorrect();
+                        e.target.classList.add('correct');
+                        e.target.readOnly = true;
+                        bData.visualDone[index] = true;
+                        renderVisualDots(index);
+                        if(index < inputs.length - 1) inputs[index + 1].focus();
+                        else completeBridgeExercise(60);
+                    } else if(e.target.value.length >= String(values[index]).length) {
+                        soundError();
+                        state.errors++;
+                        updateBridgeStats();
+                        e.target.value = "";
+                    }
+                };
+            });
+            inputs[0].focus();
+        }
+
         function updateBridgeStats() { document.getElementById('bridge-score').innerText = state.score; document.getElementById('bridge-correct').innerText = state.correct; document.getElementById('bridge-errors').innerText = state.errors; }
 
         /* RASTER LOGICA */
