@@ -27,6 +27,7 @@
             --accent: #f8c630;
             --danger: #dc2626;
             --mixed: #be185d;
+            --transaction: #087f5b;
             --ink: #142033;
             --muted: #627084;
             --line: #d8e0ea;
@@ -242,6 +243,7 @@
         .btn-orange { --button-accent: var(--bridge-color); color: #9a3412; }
         .btn-blue { --button-accent: var(--primary); color: #1d4ed8; }
         .btn-mixed { --button-accent: var(--mixed); color: #9d174d; }
+        .btn-transaction { --button-accent: var(--transaction); color: #047857; }
 
         .btn-back {
             --button-accent: #64748b;
@@ -1221,6 +1223,224 @@
             box-shadow: 0 18px 38px rgba(21,39,66,0.14), 0 1px 0 rgba(255,255,255,0.86) inset;
         }
 
+        .transaction-stage {
+            width: 100%;
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: 10px;
+        }
+
+        .transaction-product,
+        .transaction-payment {
+            min-width: 0;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 14px 30px rgba(18,32,51,0.12);
+        }
+
+        .transaction-product {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .transaction-product img {
+            width: min(100%, 210px);
+            height: 150px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .transaction-product-copy {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .transaction-product-name {
+            color: var(--ink);
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        .transaction-price {
+            color: var(--transaction);
+            font-size: clamp(1.65rem, 7vw, 2.35rem);
+            line-height: 1;
+            font-weight: 900;
+        }
+
+        .transaction-payment {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .transaction-total-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 0.86rem;
+            font-weight: 900;
+        }
+
+        .transaction-total-row strong {
+            color: var(--ink);
+            font-size: 1.35rem;
+        }
+
+        .transaction-progress {
+            width: 100%;
+            height: 10px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        #transaction-progress-fill {
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #10b981, #087f5b);
+            transition: width 0.22s ease;
+        }
+
+        .transaction-feedback {
+            min-height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #334155;
+            font-size: 0.88rem;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .transaction-feedback.success { color: #047857; }
+        .transaction-feedback.over { color: var(--danger); }
+
+        .transaction-selection {
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .payment-count {
+            padding: 4px 7px;
+            border: 1px solid rgba(8,127,91,0.22);
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #047857;
+            font-size: 0.72rem;
+            font-weight: 900;
+        }
+
+        .transaction-tools {
+            display: flex;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .transaction-tools button {
+            min-width: 42px;
+            min-height: 34px;
+            padding: 5px 10px;
+            border: 1px solid rgba(148,163,184,0.36);
+            border-radius: 8px;
+            background: #f8fafc;
+            color: #334155;
+            font: inherit;
+            font-size: 0.82rem;
+            font-weight: 900;
+        }
+
+        .transaction-wallet {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 8px;
+            padding: 10px;
+            border: 1px solid rgba(148,163,184,0.28);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.78);
+            box-shadow: 0 14px 30px rgba(18,32,51,0.1);
+        }
+
+        .money-button {
+            min-width: 0;
+            min-height: 74px;
+            padding: 6px 3px;
+            border: 1px solid rgba(148,163,184,0.32);
+            border-radius: 8px;
+            background: linear-gradient(180deg, #ffffff, #f1f5f9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(18,32,51,0.1);
+            transition: transform 0.14s ease, box-shadow 0.14s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .money-button:active {
+            transform: translateY(2px) scale(0.97);
+            box-shadow: 0 4px 9px rgba(18,32,51,0.1);
+        }
+
+        .money-button:disabled,
+        .transaction-tools button:disabled {
+            opacity: 0.58;
+            cursor: default;
+        }
+
+        .money-shape {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .money-image {
+            display: block;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+            filter: drop-shadow(0 5px 5px rgba(18,32,51,0.2));
+        }
+
+        .coin-image {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+        }
+
+        .banknote-image {
+            width: 94px;
+            height: auto;
+            border-radius: 3px;
+        }
+
+        .transaction-stage.purchased {
+            animation: transactionSuccess 0.42s ease-out;
+        }
+
+        @keyframes transactionSuccess {
+            0% { transform: scale(1); }
+            45% { transform: scale(1.015); }
+            100% { transform: scale(1); }
+        }
+
         @media (max-width: 520px) {
             body { padding: 14px; }
 
@@ -1359,6 +1579,141 @@
                 padding: 8px 12px;
                 font-size: 0.95rem;
             }
+
+            body.transaction-active {
+                padding: 8px;
+            }
+
+            body.transaction-active .header-container {
+                display: none;
+            }
+
+            body.transaction-active .screen {
+                gap: 6px;
+            }
+
+            body.transaction-active .stats-wrapper {
+                gap: 4px;
+                padding: 4px;
+                margin-bottom: 0;
+            }
+
+            body.transaction-active .stat-item {
+                min-height: 34px;
+                font-size: 0.62rem;
+            }
+
+            body.transaction-active .stat-val {
+                font-size: 0.95rem;
+            }
+
+            .transaction-stage {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .transaction-product {
+                min-height: 92px;
+                padding: 6px 8px;
+                flex-direction: row;
+                gap: 8px;
+                text-align: left;
+            }
+
+            .transaction-product img {
+                width: 112px;
+                height: 82px;
+            }
+
+            .transaction-product-copy {
+                flex: 1;
+                align-items: flex-start;
+            }
+
+            .transaction-product-name {
+                font-size: 0.84rem;
+            }
+
+            .transaction-price {
+                font-size: 1.75rem;
+            }
+
+            .transaction-payment {
+                padding: 7px 9px;
+                gap: 4px;
+            }
+
+            .transaction-total-row {
+                font-size: 0.72rem;
+            }
+
+            .transaction-total-row strong {
+                font-size: 1.05rem;
+            }
+
+            .transaction-progress { height: 7px; }
+
+            .transaction-feedback {
+                min-height: 18px;
+                font-size: 0.72rem;
+            }
+
+            .transaction-selection {
+                min-height: 22px;
+                gap: 3px;
+            }
+
+            .payment-count {
+                padding: 2px 5px;
+                font-size: 0.62rem;
+            }
+
+            .transaction-tools {
+                position: absolute;
+                right: 8px;
+                bottom: 7px;
+                gap: 4px;
+            }
+
+            .transaction-payment { position: relative; }
+
+            .transaction-tools button {
+                min-width: 32px;
+                min-height: 28px;
+                padding: 3px 7px;
+                font-size: 0.68rem;
+            }
+
+            .transaction-selection {
+                padding-right: 76px;
+            }
+
+            .transaction-wallet {
+                padding: 6px;
+                gap: 5px;
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+
+            .money-button {
+                min-height: 52px;
+                padding: 4px 2px;
+            }
+
+            .coin-image {
+                width: 42px;
+                height: 42px;
+            }
+
+            .banknote-image {
+                width: 58px;
+            }
+
+            body.transaction-active #transaction-back-btn {
+                min-height: 38px;
+                padding: 8px 12px;
+                font-size: 0.95rem;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1377,7 +1732,7 @@
 
     <div class="header-container">
         <h1>Louie's Rekentrainer</h1>
-        <div class="version">Versie 5.11</div>
+        <div class="version">Versie 5.13</div>
     </div>
 
     <!-- 0. HOOFDMENU -->
@@ -1391,6 +1746,16 @@
         <button class="btn btn-blue" onclick="navTo('sommen-menu')">2️⃣ Optellen</button>
         <button class="btn btn-orange" onclick="navTo('aftrekken-menu')">3️⃣ Aftrekken</button>
         <button class="btn btn-mixed" onclick="navTo('mixed-hub-menu')">4️⃣ Gemengde bewerkingen</button>
+        <button class="btn btn-transaction" onclick="navTo('transactions-menu')">5️⃣ Transacties</button>
+    </div>
+
+    <!-- 5. TRANSACTIES -->
+    <div id="transactions-menu" class="screen">
+        <h2>Kies een moeilijkheid:</h2>
+        <button class="btn btn-transaction favorite-source" data-favorite-id="transaction_easy" onclick="startTransactionGame('easy')">🟢 Makkelijk (hele euro's)</button>
+        <button class="btn btn-transaction favorite-source" data-favorite-id="transaction_medium" onclick="startTransactionGame('medium')">🟡 Gemiddeld (euro's en centen)</button>
+        <button class="btn btn-transaction favorite-source" data-favorite-id="transaction_hard" onclick="startTransactionGame('hard')">🔴 Moeilijk (alles door elkaar)</button>
+        <button class="btn btn-back" onclick="navTo('main-menu')">Terug</button>
     </div>
 
     <!-- 1. SOM VAN 10 HUB -->
@@ -1503,6 +1868,39 @@
         <button class="btn btn-back" id="simple-back-btn">Terug</button>
     </div>
 
+    <div id="transaction-game-screen" class="screen">
+        <div class="stats-wrapper">
+            <div class="stat-item">⭐ <span id="transaction-score" class="stat-val">0</span></div>
+            <div class="stat-item">⏱️ <span id="transaction-timer" class="stat-val">0</span>s</div>
+            <div class="stat-item">✅ <span id="transaction-correct" class="stat-val">0</span></div>
+            <div class="stat-item">❌ <span id="transaction-errors" class="stat-val">0</span></div>
+        </div>
+        <div class="transaction-stage">
+            <div class="transaction-product">
+                <img id="transaction-product-image" alt="">
+                <div class="transaction-product-copy">
+                    <div id="transaction-product-name" class="transaction-product-name"></div>
+                    <div id="transaction-price" class="transaction-price"></div>
+                </div>
+            </div>
+            <div class="transaction-payment">
+                <div class="transaction-total-row">
+                    <span>Betaald</span>
+                    <strong id="transaction-total">€ 0,00</strong>
+                </div>
+                <div class="transaction-progress"><div id="transaction-progress-fill"></div></div>
+                <div id="transaction-feedback" class="transaction-feedback" aria-live="polite"></div>
+                <div id="transaction-selection" class="transaction-selection"></div>
+                <div class="transaction-tools">
+                    <button type="button" onclick="undoTransactionAmount()" aria-label="Laatste betaalstuk ongedaan maken" title="Ongedaan maken">↶</button>
+                    <button type="button" onclick="clearTransactionPayment()">Wis</button>
+                </div>
+            </div>
+            <div id="transaction-wallet" class="transaction-wallet"></div>
+        </div>
+        <button class="btn btn-back" id="transaction-back-btn">Terug</button>
+    </div>
+
     <div id="game-screen" class="screen">
         <div class="stats-wrapper">
             <div class="stat-item">⭐ <span id="stat-score" class="stat-val">0</span></div>
@@ -1521,9 +1919,10 @@
     </div>
 
     <script>
-        let config = { type: 1, size: 8, bridgeSubMode: 'normal', bridgeOp: 'plus', bridgeBackTarget: 'bridge-selection-menu', showBridgeDots: false, simpleMode: '', lastMenu: 'main-menu', allowedNumbers: [1,2,3,4,5,6,7,8,9] };
+        let config = { type: 1, size: 8, bridgeSubMode: 'normal', bridgeOp: 'plus', bridgeBackTarget: 'bridge-selection-menu', showBridgeDots: false, simpleMode: '', transactionLevel: 'easy', lastMenu: 'main-menu', allowedNumbers: [1,2,3,4,5,6,7,8,9] };
         let state = { score: 0, errors: 0, seconds: 0, lastTime: 0, correct: 0, isGameOver: false, selected: null, cpuTarget: null, targetSum: 10 };
         let bData = {};
+        let transactionData = { productIndex: -1, price: 0, payment: [], locked: false, nextTimer: null };
         let timerInterval, audioCtx, audioUnlocked = false;
         const FAVORITES_KEY = 'louies_rekentrainer_favorites_v1';
         const BRIDGE_DOTS_KEY = 'louies_rekentrainer_bridge_dots_v1';
@@ -1552,7 +1951,10 @@
             bridge_mixed_mental: { label: '🌉 Gemengde brug - Onthoud de Rest', className: 'btn-mixed', start: () => startBridgeFavorite('mixed', 'mental') },
             bridge_mixed_hard: { label: '🌉 Gemengde brug - Uit het hoofd', className: 'btn-mixed', start: () => startBridgeFavorite('mixed', 'hard') },
             bridge_mixed_same: { label: '🔁 Gemengd - Eerst streepjes, dan voluit', className: 'btn-mixed', start: () => startBridgeDirect('mixed', 'mixed_same', 'main-menu') },
-            bridge_mixed_random: { label: '🎲 Gemengd - Willekeurige layout', className: 'btn-mixed', start: () => startBridgeDirect('mixed', 'mixed_random', 'main-menu') }
+            bridge_mixed_random: { label: '🎲 Gemengd - Willekeurige layout', className: 'btn-mixed', start: () => startBridgeDirect('mixed', 'mixed_random', 'main-menu') },
+            transaction_easy: { label: "🛍️ Transacties - Makkelijk", className: 'btn-transaction', start: () => startTransactionGame('easy', 'main-menu') },
+            transaction_medium: { label: "🛍️ Transacties - Gemiddeld", className: 'btn-transaction', start: () => startTransactionGame('medium', 'main-menu') },
+            transaction_hard: { label: "🛍️ Transacties - Moeilijk", className: 'btn-transaction', start: () => startTransactionGame('hard', 'main-menu') }
         };
 
         function unlockSilentAudio() { if(!audioCtx || audioUnlocked) return; try { let o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(440,audioCtx.currentTime); g.gain.setValueAtTime(0.0001,audioCtx.currentTime); o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+0.03); audioUnlocked=true; } catch(e){} }
@@ -1700,10 +2102,15 @@
 
         function navTo(id) {
             tryInitAudio();
+            if(id !== 'transaction-game-screen' && transactionData.nextTimer) {
+                clearTimeout(transactionData.nextTimer);
+                transactionData.nextTimer = null;
+            }
             document.querySelectorAll('.screen').forEach(s => { s.style.display = 'none'; s.classList.remove('active'); });
             const target = document.getElementById(id);
             if(target) { target.style.display = 'flex'; target.classList.add('active'); }
             document.body.classList.toggle('bridge-active', id === 'bridge-game-screen');
+            document.body.classList.toggle('transaction-active', id === 'transaction-game-screen');
             if(id === 'main-menu') renderFavorites();
             clearInterval(timerInterval);
         }
@@ -2208,6 +2615,258 @@
             });
         }
         function updateSimpleStats() { document.getElementById('simple-score').innerText = state.score; document.getElementById('simple-correct').innerText = state.correct; document.getElementById('simple-errors').innerText = state.errors; }
+
+        /* TRANSACTIES */
+        const TRANSACTION_PRODUCTS = [
+            { name: 'IJsje', emoji: '🍦', color: '#f59e0b', min: 200, max: 450 },
+            { name: 'Schrift', emoji: '📒', color: '#2563eb', min: 200, max: 800 },
+            { name: 'Etui', emoji: '🖍️', color: '#db2777', min: 500, max: 1500 },
+            { name: 'Voetbal', emoji: '⚽', color: '#0f766e', min: 800, max: 2500 },
+            { name: 'Speelgoedauto', emoji: '🚗', color: '#dc2626', min: 500, max: 1800 },
+            { name: 'Stripboek', emoji: '📚', color: '#7c3aed', min: 500, max: 1200 },
+            { name: 'Knuffelbeer', emoji: '🧸', color: '#b45309', min: 800, max: 2500 },
+            { name: 'Rugzak', emoji: '🎒', color: '#0369a1', min: 1800, max: 4500 },
+            { name: 'Koptelefoon', emoji: '🎧', color: '#4f46e5', min: 1500, max: 5000 },
+            { name: 'Bordspel', emoji: '🎲', color: '#059669', min: 1500, max: 4000 },
+            { name: 'Sportschoenen', emoji: '👟', color: '#e11d48', min: 2500, max: 7000 },
+            { name: 'Drinkfles', emoji: '🧃', color: '#0891b2', min: 600, max: 1800 },
+            { name: 'Bouwdoos', emoji: '🧱', color: '#ea580c', min: 1000, max: 5000 },
+            { name: 'Leesboek', emoji: '📖', color: '#16a34a', min: 800, max: 2000 }
+        ];
+
+        /* Official ECB common-side coins and 72 dpi SPECIMEN banknotes. */
+        const TRANSACTION_DENOMINATIONS = [
+            { value: 5, type: 'coin', image: 'euro-coin-5-cent.jpg', number: '5', unit: 'cent' },
+            { value: 10, type: 'coin', image: 'euro-coin-10-cent.jpg', number: '10', unit: 'cent' },
+            { value: 20, type: 'coin', image: 'euro-coin-20-cent.jpg', number: '20', unit: 'cent' },
+            { value: 50, type: 'coin', image: 'euro-coin-50-cent.jpg', number: '50', unit: 'cent' },
+            { value: 100, type: 'coin', image: 'euro-coin-1-euro.jpg', number: '1', unit: 'euro' },
+            { value: 200, type: 'coin', image: 'euro-coin-2-euro.jpg', number: '2', unit: 'euro' },
+            { value: 500, type: 'note', image: 'euro-note-5-specimen.jpg', number: '5', unit: 'euro' },
+            { value: 1000, type: 'note', image: 'euro-note-10-specimen.jpg', number: '10', unit: 'euro' },
+            { value: 2000, type: 'note', image: 'euro-note-20-specimen.jpg', number: '20', unit: 'euro' }
+        ];
+
+        function randomTransactionStep(min, max, step) {
+            const first = Math.ceil(min / step) * step;
+            const last = Math.floor(max / step) * step;
+            if(last <= first) return first;
+            return first + Math.floor(Math.random() * (((last - first) / step) + 1)) * step;
+        }
+
+        function generateTransactionPrice(product, level) {
+            if(level === 'easy') return randomTransactionStep(Math.max(100, product.min), product.max, 100);
+
+            const min = level === 'hard' ? Math.max(105, Math.round(product.min * 0.85)) : product.min;
+            const max = level === 'hard' ? Math.round(product.max * 1.15) : product.max;
+            let price = randomTransactionStep(min, max, 5);
+            for(let attempt = 0; attempt < 40; attempt++) {
+                const cents = price % 100;
+                const valid = level === 'medium' ? cents !== 0 : cents !== 0 && cents !== 50;
+                if(valid) return price;
+                price = randomTransactionStep(min, max, 5);
+            }
+            return price + (level === 'hard' ? 35 : 25);
+        }
+
+        function formatTransactionEuro(cents) {
+            const euros = Math.floor(cents / 100);
+            const remainder = String(cents % 100).padStart(2, '0');
+            return `€ ${euros},${remainder}`;
+        }
+
+        function shortTransactionEuro(cents) {
+            return cents < 100 ? `${cents} ct` : `€ ${cents / 100}`;
+        }
+
+        function transactionProductImage(product) {
+            const safeName = product.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="720" height="520" viewBox="0 0 720 520">
+                <defs>
+                    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="${product.color}" stop-opacity="0.16"/>
+                    </linearGradient>
+                    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#122033" flood-opacity="0.18"/></filter>
+                </defs>
+                <rect width="720" height="520" rx="42" fill="url(#bg)"/>
+                <circle cx="360" cy="260" r="190" fill="${product.color}" opacity="0.11"/>
+                <circle cx="360" cy="255" r="150" fill="#ffffff" opacity="0.92" filter="url(#shadow)"/>
+                <text x="360" y="340" text-anchor="middle" font-size="250" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">${product.emoji}</text>
+                <title>${safeName}</title>
+            </svg>`;
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        }
+
+        function startTransactionGame(level, backMenu) {
+            config.transactionLevel = level;
+            state.score = 0;
+            state.seconds = 0;
+            state.correct = 0;
+            state.errors = 0;
+            transactionData.productIndex = -1;
+            transactionData.payment = [];
+            transactionData.locked = false;
+            if(transactionData.nextTimer) clearTimeout(transactionData.nextTimer);
+            transactionData.nextTimer = null;
+            document.getElementById('transaction-back-btn').onclick = () => navTo(backMenu || 'transactions-menu');
+            navTo('transaction-game-screen');
+            renderTransactionWallet();
+            updateTransactionStats();
+            nextTransactionTask();
+            startTimer('transaction-timer');
+        }
+
+        function nextTransactionTask() {
+            let nextIndex = Math.floor(Math.random() * TRANSACTION_PRODUCTS.length);
+            if(TRANSACTION_PRODUCTS.length > 1) {
+                while(nextIndex === transactionData.productIndex) nextIndex = Math.floor(Math.random() * TRANSACTION_PRODUCTS.length);
+            }
+            transactionData.productIndex = nextIndex;
+            const product = TRANSACTION_PRODUCTS[nextIndex];
+            transactionData.price = generateTransactionPrice(product, config.transactionLevel);
+            transactionData.payment = [];
+            transactionData.locked = false;
+            transactionData.nextTimer = null;
+
+            const image = document.getElementById('transaction-product-image');
+            image.src = transactionProductImage(product);
+            image.alt = product.name;
+            document.getElementById('transaction-product-name').innerText = product.name;
+            document.getElementById('transaction-price').innerText = formatTransactionEuro(transactionData.price);
+            const stage = document.querySelector('.transaction-stage');
+            stage.classList.remove('purchased');
+            updateTransactionPayment();
+        }
+
+        function renderTransactionWallet() {
+            const wallet = document.getElementById('transaction-wallet');
+            const denominations = config.transactionLevel === 'easy'
+                ? TRANSACTION_DENOMINATIONS.filter(item => item.value >= 100)
+                : TRANSACTION_DENOMINATIONS;
+            wallet.innerHTML = '';
+            denominations.forEach(item => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'money-button';
+                button.dataset.value = item.value;
+                button.setAttribute('aria-label', `${item.number} ${item.unit} toevoegen`);
+                button.title = `${item.number} ${item.unit}`;
+                const shape = document.createElement('span');
+                shape.className = 'money-shape';
+                const image = document.createElement('img');
+                image.alt = '';
+                image.draggable = false;
+                image.loading = 'eager';
+                image.decoding = 'async';
+                image.className = `money-image ${item.type === 'coin' ? 'coin-image' : 'banknote-image'}`;
+                image.onerror = () => {
+                    if(image.dataset.retried === 'true') return;
+                    image.dataset.retried = 'true';
+                    image.src = `${item.image}?v=513`;
+                };
+                shape.appendChild(image);
+                button.appendChild(shape);
+                button.onclick = () => addTransactionAmount(item.value);
+                wallet.appendChild(button);
+                image.src = item.image;
+            });
+        }
+
+        function transactionPaymentTotal() {
+            return transactionData.payment.reduce((sum, value) => sum + value, 0);
+        }
+
+        function updateTransactionPayment() {
+            const total = transactionPaymentTotal();
+            const remaining = transactionData.price - total;
+            const totalElement = document.getElementById('transaction-total');
+            const feedback = document.getElementById('transaction-feedback');
+            const progress = document.getElementById('transaction-progress-fill');
+            const selection = document.getElementById('transaction-selection');
+            totalElement.innerText = formatTransactionEuro(total);
+            progress.style.width = `${Math.min(100, Math.round((total / transactionData.price) * 100))}%`;
+            feedback.className = 'transaction-feedback';
+
+            if(total === transactionData.price) {
+                feedback.innerText = 'Gekocht! Goed betaald.';
+                feedback.classList.add('success');
+            } else if(total > transactionData.price) {
+                feedback.innerText = `${formatTransactionEuro(total - transactionData.price)} te veel`;
+                feedback.classList.add('over');
+            } else {
+                feedback.innerText = `Nog ${formatTransactionEuro(remaining)}`;
+            }
+
+            selection.innerHTML = '';
+            const counts = new Map();
+            transactionData.payment.forEach(value => counts.set(value, (counts.get(value) || 0) + 1));
+            TRANSACTION_DENOMINATIONS.filter(item => counts.has(item.value)).forEach(item => {
+                const badge = document.createElement('span');
+                badge.className = 'payment-count';
+                badge.innerText = `${counts.get(item.value)} × ${shortTransactionEuro(item.value)}`;
+                selection.appendChild(badge);
+            });
+
+            document.querySelectorAll('#transaction-wallet .money-button').forEach(button => {
+                button.disabled = transactionData.locked;
+            });
+            document.querySelectorAll('.transaction-tools button').forEach(button => {
+                button.disabled = transactionData.locked;
+            });
+        }
+
+        function addTransactionAmount(value) {
+            if(transactionData.locked) return;
+            transactionData.payment.push(value);
+            const total = transactionPaymentTotal();
+
+            if(total === transactionData.price) {
+                transactionData.locked = true;
+                state.correct++;
+                state.score += Math.max(40, 120 - (transactionData.payment.length * 4));
+                soundCorrect();
+                updateTransactionStats();
+                document.querySelector('.transaction-stage').classList.add('purchased');
+                updateTransactionPayment();
+                transactionData.nextTimer = setTimeout(nextTransactionTask, 1100);
+                return;
+            }
+
+            if(total > transactionData.price) {
+                transactionData.locked = true;
+                state.errors++;
+                soundError();
+                updateTransactionStats();
+                updateTransactionPayment();
+                transactionData.nextTimer = setTimeout(() => {
+                    transactionData.payment.pop();
+                    transactionData.locked = false;
+                    transactionData.nextTimer = null;
+                    updateTransactionPayment();
+                }, 650);
+                return;
+            }
+
+            updateTransactionPayment();
+        }
+
+        function undoTransactionAmount() {
+            if(transactionData.locked || !transactionData.payment.length) return;
+            transactionData.payment.pop();
+            updateTransactionPayment();
+        }
+
+        function clearTransactionPayment() {
+            if(transactionData.locked) return;
+            transactionData.payment = [];
+            updateTransactionPayment();
+        }
+
+        function updateTransactionStats() {
+            document.getElementById('transaction-score').innerText = state.score;
+            document.getElementById('transaction-correct').innerText = state.correct;
+            document.getElementById('transaction-errors').innerText = state.errors;
+        }
 
         function startTimer(id) { clearInterval(timerInterval); timerInterval = setInterval(() => { state.seconds++; const el = document.getElementById(id); if(el) el.innerText = state.seconds; }, 1000); }
         function checkWin() { let p = false; const target = (config.type===5)?state.targetSum:10; for(let i=0; i<grid.length; i++) for(let j=i+1; j<grid.length; j++) if(grid[i].val+grid[j].val===target) p=true; if(grid.length === 0 || !p) { state.isGameOver=true; clearInterval(timerInterval); document.getElementById('msg').innerText = grid.length===0?"🎉 GEWONNEN!":"⛔ STOP!"; document.getElementById('retry-btn').style.display='flex'; return true; } return false; }
